@@ -13,7 +13,10 @@ public:
 	void set_player(int, int);
 	void build();
 	void fill_components();
+    void print_comps();
 private:
+    void topsort(vector<vector<int>>&, vector<int>&, vector<int>&, int);
+    void find_one_component(vector<vector<int>>&, int, int);
 	vector<vector<int>> g;
 	vector<int> player;
 	vector<int> component;
