@@ -10,8 +10,8 @@ int main() {
     const BoolVar c = cp_model.NewBoolVar();
     cp_model.AddBoolOr({a, b});
     cp_model.AddBoolOr({Not(a), Not(b), Not(c)});
-    cp_model.AddBoolOr({c});
-    // cp_model.AddBoolOr({Not(c)});
+    //cp_model.AddBoolOr({c});
+    //cp_model.AddBoolOr({Not(c)});
     int num_solutions = 0;
     Model model;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse& r) {
