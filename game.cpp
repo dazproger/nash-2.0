@@ -1,8 +1,7 @@
 #include "game.h"
 #include <algorithm>
-#include <iostream>
 
-Game::Game(int n, int start): start(start), g(n), player(n), component(n), component_graph(n) {
+Game::Game(int n, int start) : g(n), player(n), component(n), component_graph(n), start(start) {
 }
 
 void Game::add_edge(int from, int to) {
@@ -11,7 +10,7 @@ void Game::add_edge(int from, int to) {
 
 void Game::fill_components() {
     // Sorry guys, but I cannot do it another way
-    vector<vector<int>> &graph = g;
+    vector<vector<int>>& graph = g;
     int n = graph.size();
     vector<vector<int>> reversed_graph(graph.size());
     for (int v = 0; v < n; ++v) {
@@ -33,9 +32,11 @@ void Game::fill_components() {
     for (int i = 0; i < n; ++i) {
         if (component[sorted_vertexes[i]] == -1) {
             find_one_component(reversed_graph, sorted_vertexes[i], component_number++);
+            sort(component_graph[component_number - 1].begin(), component_graph[component_number - 1].end());
+            component_graph[component_number - 1].resize(
+                unique(component_graph[component_number - 1].begin(), component_graph[component_number - 1].end()) -
+                component_graph[component_number - 1].begin());
         }
-        sort(component_graph.begin(), component_graph.end());
-        component_graph.resize(unique(component_graph.begin(), component_graph.end()) - component_graph.begin());
     }
 }
 
@@ -55,7 +56,7 @@ void Game::find_one_component(vector<vector<int>>& graph, int v, int component_n
         if (component[u] == -1) {
             find_one_component(graph, u, component_number);
         } else {
-            component_graph[component_number].push_back(component[u]); // Not sure if we need this
+            component_graph[component_number].push_back(component[u]);  // Not sure if we need this
         }
     }
 }
