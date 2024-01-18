@@ -60,3 +60,25 @@ void Game::find_one_component(vector<vector<int>>& graph, int v, int component_n
         }
     }
 }
+
+void Game::generate(vector<Strategy> &s, vector<int>& strategy, int done_vertexes) {
+    if (done_vertexes == g.size()) {
+        s.emplace_back(strategy);
+        return;
+    }
+    if (g[done_vertexes].empty()) {
+        strategy[done_vertexes] = done_vertexes;
+        generate(s, strategy, done_vertexes + 1);
+    }
+    for (auto neig : g[done_vertexes]) {
+        strategy[done_vertexes] = neig;
+        generate(s, strategy, done_vertexes + 1);
+    }
+}
+
+vector<Strategy> Game::generate_strategies() {
+    player_cnt = *max_element(player.begin(), player.end());
+    vector<Strategy> strategies;
+    vector<int> strategy(g.size());
+    generate(strategies, strategy, 0);
+}
