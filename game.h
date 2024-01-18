@@ -14,6 +14,8 @@ public:
     vector<Strategy> generate_strategies();
     vector<Strategy> neighbour_strategies(Strategy);
     vector<int> get_terminal_components();
+    void generate(vector<Strategy>& s, vector<int>& strategy, int done_vertexes);
+    vector<Strategy> neighbour_strategies(Strategy, int);
 	void fill_components();
     void print_comps();
 private:
@@ -24,4 +26,5 @@ private:
 	vector<int> component;
 	vector<vector<int>> component_graph;
 	int start;
+    int player_cnt = 0;
 };
