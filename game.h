@@ -9,7 +9,7 @@ using namespace std;
 class Game {
 public:
 	Game(int, int);
-	void add_edge(int, int);
+	void add_edge(int, int); // Terminal should be looped into itself
 	void set_player(int, int);
 	void build();
 	void fill_components();
