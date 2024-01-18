@@ -13,6 +13,7 @@ public:
 	void set_player(int, int);
     vector<Strategy> generate_strategies();
     vector<Strategy> neighbour_strategies(Strategy);
+    vector<int> get_terminal_components();
 	void fill_components();
     void print_comps();
 private:

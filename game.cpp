@@ -38,6 +38,7 @@ void Game::fill_components() {
                 component_graph[component_number - 1].begin());
         }
     }
+    component_graph.resize(component_number);
 }
 
 void Game::topsort(vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) {
@@ -59,4 +60,21 @@ void Game::find_one_component(vector<vector<int>>& graph, int v, int component_n
             component_graph[component_number].push_back(component[u]);  // Not sure if we need this
         }
     }
+}
+
+vector<int> Game::get_terminal_components() {
+    int n_comps = component_graph.size(); // Number of components
+    int n_verts = g.size(); // Number of vertexes
+    vector<int> cnt_components(n_comps); // cnt_comoponents[i] - number of vertexes in comoponent i
+    for (int i = 0; i < n_verts; ++i) {
+        ++cnt_components[component[i]];
+    }
+    vector<int> is_terminal(n_comps);
+    for (int i = 0; i < n_comps; ++i) {
+        is_terminal[i] = cnt_components[i] > 2;
+        for (int destination_component : component_graph[i]) {
+            is_terminal[i] |= (destination_component == i);
+        }
+    }
+    return is_terminal;
 }
