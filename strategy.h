@@ -14,7 +14,12 @@ public:
         return data_[from];
     };
 	int operator() (int from) {
-        return data_[from];
+        size_t cnt = 0;
+        while (cnt < data_.size() + 10) {
+            from = data_[from];
+            ++cnt;
+        }
+        return from;
     };
     int GetId(){
         return id;
