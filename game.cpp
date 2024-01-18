@@ -99,6 +99,7 @@ vector<Strategy> Game::generate_strategies() {
     vector<Strategy> strategies;
     vector<int> strategy(g.size());
     generate(strategies, strategy, 0);
+    return strategies;
 }
 
 vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) {
