@@ -82,3 +82,17 @@ vector<Strategy> Game::generate_strategies() {
     vector<int> strategy(g.size());
     generate(strategies, strategy, 0);
 }
+
+vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) {
+    vector<Strategy> ans;
+    for (int i = 0; i < player.size();++i) {
+        if (player[i] == k) {
+            for (auto edge : g[i]) {
+                if (edge != strategy[i]) {
+                    ans.push_back(strategy.GetNewStrategy(i, edge));
+                }
+            }
+        }
+    }
+    return ans;
+}

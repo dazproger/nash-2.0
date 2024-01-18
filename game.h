@@ -13,7 +13,7 @@ public:
 	void set_player(int, int);
     vector<Strategy> generate_strategies();
     void generate(vector<Strategy>& s, vector<int>& strategy, int done_vertexes);
-    vector<Strategy> neighbour_strategies(Strategy);
+    vector<Strategy> neighbour_strategies(Strategy, int);
 	void fill_components();
     void print_comps();
 private:
