@@ -60,3 +60,17 @@ void Game::find_one_component(vector<vector<int>>& graph, int v, int component_n
         }
     }
 }
+
+vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) {
+    vector<Strategy> ans;
+    for (int i = 0; i < player.size();++i) {
+        if (player[i] == k) {
+            for (auto edge : g[i]) {
+                if (edge != strategy[i]) {
+                    ans.push_back(strategy.GetNewStrategy(i, edge));
+                }
+            }
+        }
+    }
+    return ans;
+}

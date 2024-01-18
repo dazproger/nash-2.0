@@ -6,8 +6,6 @@ using namespace std;
 struct Strategy {
 public:
 	Strategy(const vector<int>& strategy){
-        id = last_id;
-        ++last_id;
         data_ = strategy;
     }
 	int operator[] (int from){
@@ -24,9 +22,11 @@ public:
     int GetId(){
         return id;
     }
+    Strategy GetNewStrategy(int index, int new_edge) {
+        auto data = data_;
+        data[index] = new_edge;
+        return data;
+    }
 private:
-	static inline int last_id=0;
 	vector<int> data_;
-	int id;
-	int final_vertex; // Probably needs to be removed
 };

@@ -12,7 +12,7 @@ public:
 	void add_edge(int, int);
 	void set_player(int, int);
     vector<Strategy> generate_strategies();
-    vector<Strategy> neighbour_strategies(Strategy);
+    vector<Strategy> neighbour_strategies(Strategy, int);
 	void fill_components();
     void print_comps();
 private:
