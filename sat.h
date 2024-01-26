@@ -12,9 +12,13 @@ public:
     SAT(const Game&);
     // Adds strategy restriction to the SAT
     void add_strategy(const Strategy&, const Game&);
+    // Adds all strategies from the game
+    void add_all_strategies(const Game&);
     // Solves the SAT and prints the results
     void solve();
+    // Returns the X_ijk Boolean variable
+    BoolVar get_var(int i, int j, int k);
 private:
     CpModelBuilder cp_model;
-    vector<vector<vector<BoolVar>>> variables;
+    vector<vector<vector<optional<BoolVar>>>> variables;
 };
