@@ -136,5 +136,5 @@ int Game::get_player_count() const {
 }
 
 int Game::play_strat(const Strategy& strat) const {
-    return strat(start);
+    return component[strat(start)];
 }
