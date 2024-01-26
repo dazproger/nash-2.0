@@ -11,16 +11,16 @@ public:
 	Game(int, int);
 	void add_edge(int, int);
 	void set_player(int, int);
-    vector<Strategy> generate_strategies();
-    vector<Strategy> neighbour_strategies(Strategy);
-    vector<int> get_terminal_components();
-    void generate(vector<Strategy>& s, vector<int>& strategy, int done_vertexes);
-    vector<Strategy> neighbour_strategies(Strategy, int);
+    vector<Strategy> generate_strategies() const;
+    vector<Strategy> neighbour_strategies(Strategy) const;
+    vector<int> get_terminal_components() const;
+    vector<Strategy> neighbour_strategies(Strategy, int) const;
 	void fill_components();
-    void print_comps();
+    int play_strat(const Strategy&) const;
+    int get_player_count() const;
+    int get_vertices_count() const;
+    int get_components_count() const;
 private:
-    void topsort(vector<vector<int>>&, vector<int>&, vector<int>&, int);
-    void find_one_component(vector<vector<int>>&, int, int);
 	vector<vector<int>> g;
 	vector<int> player;
 	vector<int> component;

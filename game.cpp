@@ -8,18 +8,48 @@ void Game::add_edge(int from, int to) {
     g[from].push_back(to);
 }
 
+void Game::set_player(int i, int player) {
+    this -> player[i] = player;
+    player_cnt = max(player, player_cnt);
+}
+
+static void topsort(const vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) {
+    used[v] = 1;
+    for (int u : graph[v]) {
+        if (!used[u]) {
+            topsort(graph, used, sorted_vertexes, u);
+        }
+    }
+    sorted_vertexes.push_back(v);
+}
+
+static void find_one_component(const vector<vector<int>>& graph, vector<int>& component, vector<vector<int>>& component_graph, int v, int component_number) {
+    component[v] = component_number;
+    for (int u : graph[v]) {
+        if (component[u] == -1) {
+            find_one_component(graph, component, component_graph, u, component_number);
+        } else {
+            component_graph[component_number].push_back(component[u]); 
+        }
+    }
+}
+
+static void make_unique(vector<int>& vec) {
+    sort(vec.begin(), vec.end());
+    vec.resize(unique(vec.begin(), vec.end()) - vec.begin());
+}
+
 void Game::fill_components() {
-    // Sorry guys, but I cannot do it another way
-    vector<vector<int>>& graph = g;
-    int n = graph.size();
-    vector<vector<int>> reversed_graph(graph.size());
+    vector<vector<int>>& graph = g; // Rename g to graph in this function
+    int n = get_vertices_count();
+    vector<vector<int>> reversed_graph(n);
     for (int v = 0; v < n; ++v) {
         for (int u : graph[v]) {
             reversed_graph[u].push_back(v);
         }
     }
     vector<int> sorted_vertexes;
-    vector<int> used(n);
+    vector<int> used(n, 0);
     for (int v = 0; v < n; ++v) {
         if (!used[v]) {
             topsort(graph, used, sorted_vertexes, v);
@@ -31,40 +61,19 @@ void Game::fill_components() {
     int component_number = 0;
     for (int i = 0; i < n; ++i) {
         if (component[sorted_vertexes[i]] == -1) {
-            find_one_component(reversed_graph, sorted_vertexes[i], component_number++);
-            sort(component_graph[component_number - 1].begin(), component_graph[component_number - 1].end());
-            component_graph[component_number - 1].resize(
-                unique(component_graph[component_number - 1].begin(), component_graph[component_number - 1].end()) -
-                component_graph[component_number - 1].begin());
+            find_one_component(reversed_graph, component, component_graph, sorted_vertexes[i], component_number);
+            make_unique(component_graph[component_number]);
+            ++component_number;
         }
     }
     component_graph.resize(component_number);
 }
 
-void Game::topsort(vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) {
-    used[v] = 1;
-    for (int u : graph[v]) {
-        if (!used[u]) {
-            topsort(graph, used, sorted_vertexes, u);
-        }
-    }
-    sorted_vertexes.push_back(v);
-}
 
-void Game::find_one_component(vector<vector<int>>& graph, int v, int component_number) {
-    component[v] = component_number;
-    for (int u : graph[v]) {
-        if (component[u] == -1) {
-            find_one_component(graph, u, component_number);
-        } else {
-            component_graph[component_number].push_back(component[u]);  // Not sure if we need this
-        }
-    }
-}
 
-vector<int> Game::get_terminal_components() {
-    int n_comps = component_graph.size(); // Number of components
-    int n_verts = g.size(); // Number of vertexes
+vector<int> Game::get_terminal_components() const {
+    int n_comps = get_components_count(); // Number of components
+    int n_verts = get_vertices_count(); // Number of vertexes
     vector<int> cnt_components(n_comps); // cnt_comoponents[i] - number of vertexes in comoponent i
     for (int i = 0; i < n_verts; ++i) {
         ++cnt_components[component[i]];
@@ -79,32 +88,31 @@ vector<int> Game::get_terminal_components() {
     return is_terminal;
 }
 
-void Game::generate(vector<Strategy> &s, vector<int>& strategy, int done_vertexes) {
+static void generate(const vector<vector<int>>& g, vector<Strategy> &s, vector<int>& strategy, int done_vertexes) {
     if (done_vertexes == g.size()) {
         s.emplace_back(strategy);
         return;
     }
     if (g[done_vertexes].empty()) {
         strategy[done_vertexes] = done_vertexes;
-        generate(s, strategy, done_vertexes + 1);
+        generate(g, s, strategy, done_vertexes + 1);
     }
     for (auto neig : g[done_vertexes]) {
         strategy[done_vertexes] = neig;
-        generate(s, strategy, done_vertexes + 1);
+        generate(g, s, strategy, done_vertexes + 1);
     }
 }
 
-vector<Strategy> Game::generate_strategies() {
-    player_cnt = *max_element(player.begin(), player.end());
+vector<Strategy> Game::generate_strategies() const {
     vector<Strategy> strategies;
-    vector<int> strategy(g.size());
-    generate(strategies, strategy, 0);
+    vector<int> strategy(get_vertices_count());
+    generate(g, strategies, strategy, 0);
     return strategies;
 }
 
-vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) {
+vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) const {
     vector<Strategy> ans;
-    for (int i = 0; i < player.size();++i) {
+    for (int i = 0; i < get_player_count();++i) {
         if (player[i] == k) {
             for (auto edge : g[i]) {
                 if (edge != strategy[i]) {
@@ -114,4 +122,19 @@ vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) {
         }
     }
     return ans;
+}
+
+int Game::get_vertices_count() const {
+    return g.size();
+}
+
+int Game::get_components_count() const {
+    return component_graph.size();
+}
+int Game::get_player_count() const {
+    return player_cnt;
+}
+
+int Game::play_strat(const Strategy& strat) const {
+    return strat(start);
 }
