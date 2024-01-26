@@ -85,7 +85,13 @@ vector<int> Game::get_terminal_components() const {
             is_terminal[i] |= (destination_component == i);
         }
     }
-    return is_terminal;
+    vector<int> terminals;
+    for (int i = 0; i < get_components_count(); ++i) {
+        if (is_terminal[i]) {
+            terminals.push_back(i);
+        }
+    }
+    return terminals;
 }
 
 static void generate(const vector<vector<int>>& g, vector<Strategy> &s, vector<int>& strategy, int done_vertexes) {
