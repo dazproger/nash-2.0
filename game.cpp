@@ -69,8 +69,6 @@ void Game::fill_components() {
     component_graph.resize(component_number);
 }
 
-
-
 vector<int> Game::get_terminal_components() const {
     int n_comps = get_components_count(); // Number of components
     int n_verts = get_vertices_count(); // Number of vertexes

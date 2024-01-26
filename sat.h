@@ -16,6 +16,7 @@ public:
     void add_all_strategies(const Game&);
     // Solves the SAT and prints the results
     void solve();
+    // Should add another function that extracts data from solved SAT
     // Returns the X_ijk Boolean variable
     BoolVar get_var(int i, int j, int k);
 private:

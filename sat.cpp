@@ -1,5 +1,28 @@
 #include "sat.h"
-#include <iostream>
+#include <format>
+
+SAT::SAT(const Game& game) {
+    variables.resize(game.get_components_count());
+    for (int i = 0; i < game.get_components_count(); ++i) {
+        variables[i].resize(game.get_components_count());
+        for (int j = 0; j < game.get_components_count(); ++j) {
+            variables[i][j].resize(game.get_player_count());
+        }
+    }
+    vector<int> terminals = game.get_terminal_components();
+    for (int i = 0; i < terminals.size(); ++i) {
+        // Here we assume that an outcome can never be better than itself
+        for (int k = 0; k < game.get_player_count(); ++k) {
+            variables[terminals[i]][terminals[i]][k] = cp_model.FalseVar();
+        }
+        for (int j = i + 1; j < terminals.size(); ++j) {
+            for (int k = 0; k < game.get_player_count(); ++k) {
+                variables[terminals[i]][terminals[j]][k] = cp_model.NewBoolVar().WithName(format("X_{}_{}_{}", terminals[i], terminals[j], k));
+            }
+        }
+    }
+    // Add triangle restrictions here
+}
 
 void SAT::solve() {
     Model model;
