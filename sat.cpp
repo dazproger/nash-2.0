@@ -44,6 +44,35 @@ void SAT::solve() {
     }
 }
 
+void SAT::print_results() {
+    Model model;
+    const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
+    if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
+        cout << "Solution not found (((((((" << endl;
+    }
+    int k = variables[0][0].size();
+    for (int player = 0; player < k; ++player) {
+        vector<int> order;
+        for (int i = 0; i < variables.size(); ++i) {
+            bool found = false;
+            int cnt_better = 0;
+            for (const auto& vec2 : variables[i]) {
+                if (vec2[player]) {
+                    found = true;
+                    cnt_better += SolutionBooleanValue(response, vec2[player].value());
+                }
+            }
+            if (!found) continue;
+            order[cnt_better] = i;
+        }
+        cout << "Order for player " << player << ": ";
+        for (auto elem : order) {
+            cout << elem << ' ';
+        }
+        cout << '\n';
+    }
+}
+
 BoolVar SAT::get_var(int i, int j, int k) {
     if (i < j) {
         return variables[i][j][k].value();

@@ -17,6 +17,7 @@ public:
     // Solves the SAT and prints the results
     void solve();
     // Should add another function that extracts data from solved SAT
+    void print_results();
     // Returns the X_ijk Boolean variable
     BoolVar get_var(int i, int j, int k);
 private:
