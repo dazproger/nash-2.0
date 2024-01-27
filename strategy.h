@@ -19,6 +19,9 @@ public:
         }
         return from;
     };
+    int GetId(){
+        return id;
+    }
     Strategy GetNewStrategy(int index, int new_edge) {
         auto data = data_;
         data[index] = new_edge;
