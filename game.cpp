@@ -123,9 +123,17 @@ vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) const {
     vector<Strategy> ans;
     for (int i = 0; i < get_player_count();++i) {
         if (player[i] == k) {
+            size_t n = ans.size();
             for (auto edge : g[i]) {
                 if (edge != strategy[i]) {
                     ans.push_back(strategy.GetNewStrategy(i, edge));
+                }
+            }
+            for (size_t j = 0;j < n;++j) {
+                for (auto edge : g[i]) {
+                    if (edge != ans[j][i]) {
+                        ans.push_back(ans[j].GetNewStrategy(i, edge));
+                    }
                 }
             }
         }

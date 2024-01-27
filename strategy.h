@@ -11,7 +11,7 @@ public:
 	int operator[] (int from){
         return data_[from];
     };
-	int operator() (int from) {
+	int operator() (int from) const {
         size_t cnt = 0;
         while (cnt < data_.size() + 10) {
             from = data_[from];
