@@ -121,7 +121,7 @@ vector<Strategy> Game::generate_strategies() const {
 
 vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) const {
     vector<Strategy> ans;
-    for (int i = 0; i < get_player_count();++i) {
+    for (int i = 0; i < get_vertices_count();++i) {
         if (player[i] == k) {
             size_t n = ans.size();
             for (auto edge : g[i]) {

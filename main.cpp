@@ -32,6 +32,6 @@ int main() {
     g.fill_components();
     SAT s(g);
     s.add_all_strategies(g);
-    s.solve();
+    s.print_results();
     return 0;
 }

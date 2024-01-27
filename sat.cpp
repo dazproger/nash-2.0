@@ -74,19 +74,21 @@ void SAT::print_results() {
     if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
         cout << "Solution not found (((((((" << endl;
     }
+    vector<int> terminals;
+    for (int i = 0; i < variables.size(); ++i) {
+        if (variables[i][i][0]) {
+            terminals.push_back(i);
+        }
+    }
     int k = variables[0][0].size();
     for (int player = 0; player < k; ++player) {
-        vector<int> order;
-        for (int i = 0; i < variables.size(); ++i) {
-            bool found = false;
+        vector<int> order(terminals.size());
+        for (int i : terminals) {
             int cnt_better = 0;
-            for (const auto &vec2: variables[i]) {
-                if (vec2[player]) {
-                    found = true;
-                    cnt_better += SolutionBooleanValue(response, vec2[player].value());
-                }
+            for (int j : terminals) {
+                if (i == j) continue;
+                cnt_better += SolutionBooleanValue(response, get_var(i, j, player));
             }
-            if (!found) continue;
             order[cnt_better] = i;
         }
         cout << "Order for player " << player << ": ";
