@@ -13,7 +13,7 @@ SAT::SAT(const Game &game) {
     for (int i = 0; i < terminals.size(); ++i) {
         // Here we assume that an outcome can never be better than itself
         for (int k = 0; k < game.get_player_count(); ++k) {
-            variables[terminals[i]][terminals[i]][k] = cp_model.FalseVar();
+            variables[terminals[i]][terminals[i]][k] = cp_model.FalseVar().WithName("I am always false");
         }
         for (int j = i + 1; j < terminals.size(); ++j) {
             for (int k = 0; k < game.get_player_count(); ++k) {
@@ -107,15 +107,15 @@ BoolVar SAT::get_var(int i, int j, int k) {
 
 void SAT::add_strategy(const Strategy &strat, const Game &game) {
     int outcome = game.play_strat(strat);
+    vector<BoolVar> or_clause;
     for (int k = 0; k < game.get_player_count(); ++k) {
-        vector<BoolVar> or_clause;
         for (const auto &neighbour_strat: game.neighbour_strategies(strat, k)) {
             int other_outcome = game.play_strat(neighbour_strat);
             if (other_outcome == outcome) continue;
             or_clause.push_back(get_var(other_outcome, outcome, k));
         }
-        cp_model.AddBoolOr(or_clause);
     }
+    cp_model.AddBoolOr(or_clause);
 }
 
 void SAT::add_all_strategies(const Game &game) {

@@ -10,7 +10,7 @@ void Game::add_edge(int from, int to) {
 
 void Game::set_player(int i, int player) {
     this -> player[i] = player;
-    player_cnt = max(player, player_cnt);
+    player_cnt = max(player + 1, player_cnt);
 }
 
 static void topsort(const vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) {
@@ -29,7 +29,7 @@ static void find_one_component(const vector<vector<int>>& graph, vector<int>& co
         if (component[u] == -1) {
             find_one_component(graph, component, component_graph, u, component_number);
         } else {
-            component_graph[component_number].push_back(component[u]); 
+            component_graph[component[u]].push_back(component_number); 
         }
     }
 }
@@ -62,11 +62,16 @@ void Game::fill_components() {
     for (int i = 0; i < n; ++i) {
         if (component[sorted_vertexes[i]] == -1) {
             find_one_component(reversed_graph, component, component_graph, sorted_vertexes[i], component_number);
-            make_unique(component_graph[component_number]);
             ++component_number;
         }
     }
     component_graph.resize(component_number);
+    for (int i = 0; i < component_number; ++i) {
+        make_unique(component_graph[i]);
+        if (component_graph[i].empty()) {
+            component_graph[i].push_back(i);
+        }
+    }
 }
 
 vector<int> Game::get_terminal_components() const {
