@@ -11,7 +11,7 @@ target_link_libraries(sat-test ortools::ortools)
 
 # FILE(GLOB Sources *.cpp)
 
-add_executable(nash_equilibrium main.cpp game.cpp)
+add_executable(nash_equilibrium main.cpp game.cpp sat.cpp)
 add_executable(nash_equilibrium_asan main.cpp game.cpp)
 
 # target_link_libraries(nash_equilibrium ortools::ortools)
