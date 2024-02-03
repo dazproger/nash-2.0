@@ -14,6 +14,8 @@ public:
     void add_strategy(const Strategy&, const Game&);
     // Adds all strategies from the game
     void add_all_strategies(const Game&);
+    // Adds a constraint that an outcome is better than another outcome for a fixed player
+    void add_contraint(int, int, int);
     // Solves the SAT and prints the results
     void solve();
     // Should add another function that extracts data from solved SAT

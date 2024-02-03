@@ -48,6 +48,10 @@ SAT::SAT(const Game &game) {
     }
 }
 
+void SAT::add_contraint(int i, int j, int k) {
+    cp_model.AddBoolOr({get_var(i, j, k)});
+}
+
 void SAT::solve() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
@@ -73,6 +77,7 @@ void SAT::print_results() {
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
     if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
         cout << "Solution not found (((((((" << endl;
+        return;
     }
     vector<int> terminals;
     for (int i = 0; i < variables.size(); ++i) {

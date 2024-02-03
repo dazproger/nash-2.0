@@ -33,6 +33,7 @@ int main() {
     SAT s(g);
     s.add_all_strategies(g);
     g.print_components();
+    s.add_contraint(2, 3, 2);
     s.print_results();
     return 0;
 }
