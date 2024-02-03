@@ -20,6 +20,8 @@ public:
     void solve();
     // Should add another function that extracts data from solved SAT
     void print_results();
+    // Prints all solutions of SAT
+    void print_all_solutions();
     // Returns the X_ijk Boolean variable
     BoolVar get_var(int i, int j, int k);
 private:

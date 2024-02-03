@@ -17,8 +17,8 @@ SAT::SAT(const Game &game) {
         }
         for (int j = i + 1; j < terminals.size(); ++j) {
             for (int k = 0; k < game.get_player_count(); ++k) {
-                variables[terminals[i]][terminals[j]][k] = cp_model.NewBoolVar().WithName(
-                        format("X_{}_{}_{}", terminals[i], terminals[j], k));
+                variables[terminals[i]][terminals[j]][k] =
+                    cp_model.NewBoolVar().WithName(format("X_{}_{}_{}", terminals[i], terminals[j], k));
             }
         }
     }
@@ -31,7 +31,8 @@ SAT::SAT(const Game &game) {
                     int second_ter = terminals[second];
                     int third_ter = terminals[third];
                     // a bit of a kostil here, i should have checked, that one of the edges is backwards,
-                    // but we have triangles in both directions, so i can check, that one of them is in the right direction
+                    // but we have triangles in both directions, so i can check, that one of them is in the right
+                    // direction
                     vector<BoolVar> triangle;
                     triangle.push_back(get_var(first_ter, second_ter, player));
                     triangle.push_back(get_var(second_ter, third_ter, player));
@@ -56,9 +57,9 @@ void SAT::solve() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
     if (response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE) {
-        for (const auto &vec1: variables) {
-            for (const auto &vec2: vec1) {
-                for (optional<BoolVar> var: vec2) {
+        for (const auto &vec1 : variables) {
+            for (const auto &vec2 : vec1) {
+                for (optional<BoolVar> var : vec2) {
                     if (var) {
                         cout << var.value().Name() << " = " << SolutionBooleanValue(response, var.value()) << '\n';
                     }
@@ -91,17 +92,54 @@ void SAT::print_results() {
         for (int i : terminals) {
             int cnt_better = 0;
             for (int j : terminals) {
-                if (i == j) continue;
+                if (i == j)
+                    continue;
                 cnt_better += SolutionBooleanValue(response, get_var(i, j, player));
             }
             order[cnt_better] = i;
         }
         cout << "Order for player " << player << ": ";
-        for (auto elem: order) {
+        for (auto elem : order) {
             cout << elem << ' ';
         }
         cout << '\n';
     }
+}
+
+void SAT::print_all_solutions() {
+    Model model;
+    int num_solutions = 0;
+    model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
+        cout << "Solution #" << num_solutions++ << '\n';
+        vector<int> terminals;
+        for (int i = 0; i < variables.size(); ++i) {
+            if (variables[i][i][0]) {
+                terminals.push_back(i);
+            }
+        }
+        int k = variables[0][0].size();
+        for (int player = 0; player < k; ++player) {
+            vector<int> order(terminals.size());
+            for (int i : terminals) {
+                int cnt_better = 0;
+                for (int j : terminals) {
+                    if (i == j)
+                        continue;
+                    cnt_better += SolutionBooleanValue(response, get_var(i, j, player));
+                }
+                order[cnt_better] = i;
+            }
+            cout << "Order for player " << player << ": ";
+            for (auto elem : order) {
+                cout << elem << ' ';
+            }
+            cout << '\n';
+        }
+    }));
+    SatParameters parameters;
+    parameters.set_enumerate_all_solutions(true);
+    model.Add(NewSatParameters(parameters));
+    const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
 }
 
 BoolVar SAT::get_var(int i, int j, int k) {
@@ -116,9 +154,10 @@ void SAT::add_strategy(const Strategy &strat, const Game &game) {
     int outcome = game.play_strat(strat);
     vector<BoolVar> or_clause;
     for (int k = 0; k < game.get_player_count(); ++k) {
-        for (const auto &neighbour_strat: game.neighbour_strategies(strat, k)) {
+        for (const auto &neighbour_strat : game.neighbour_strategies(strat, k)) {
             int other_outcome = game.play_strat(neighbour_strat);
-            if (other_outcome == outcome) continue;
+            if (other_outcome == outcome)
+                continue;
             or_clause.push_back(get_var(other_outcome, outcome, k));
         }
     }
@@ -126,7 +165,7 @@ void SAT::add_strategy(const Strategy &strat, const Game &game) {
 }
 
 void SAT::add_all_strategies(const Game &game) {
-    for (const auto &strat: game.generate_strategies()) {
+    for (const auto &strat : game.generate_strategies()) {
         add_strategy(strat, game);
     }
 }
