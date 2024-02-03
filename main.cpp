@@ -32,6 +32,7 @@ int main() {
     g.fill_components();
     SAT s(g);
     s.add_all_strategies(g);
+    g.print_components();
     s.print_results();
     return 0;
 }

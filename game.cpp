@@ -1,5 +1,6 @@
 #include "game.h"
 #include <algorithm>
+#include <iostream>
 
 Game::Game(int n, int start) : g(n), player(n), component(n), component_graph(n), start(start) {
 }
@@ -74,10 +75,24 @@ void Game::fill_components() {
     }
 }
 
+void Game::print_components() const {
+    vector<vector<int>> components(get_components_count());
+    for (int i = 0; i < get_vertices_count(); ++i) {
+        components[component[i]].push_back(i);
+    }
+    for (int i = 0; i < get_components_count(); ++i) {
+        cout << "Component " << i << ": ";
+        for (int j = 0; j < components[i].size(); ++j) {
+            cout << (j == 0 ? "" : ", ") << components[i][j];
+        }
+        cout << '\n';
+    }
+}
+
 vector<int> Game::get_terminal_components() const {
     int n_comps = get_components_count(); // Number of components
     int n_verts = get_vertices_count(); // Number of vertexes
-    vector<int> cnt_components(n_comps); // cnt_comoponents[i] - number of vertexes in comoponent i
+    vector<int> cnt_components(n_comps); // cnt_components[i] - number of vertexes in component i
     for (int i = 0; i < n_verts; ++i) {
         ++cnt_components[component[i]];
     }
