@@ -128,7 +128,9 @@ void SAT::print_beautiful_results(const Game& game) {
             std::cout << el << " ";
         }
         if (cnt_components[my_terminals[i]].size() > 1) {
+            std::cout << "\x1b[32;1m"; // Print in bold green
             std::cout << " IT'S A CYCLE";
+            std::cout << "\x1b[0m"; // Reset color
         }
         std::cout << "\n";
     }
@@ -178,7 +180,7 @@ void SAT::print_all_solutions() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << num_solutions++ << '\n';
+        cout << "Solution #" << ++num_solutions << '\n';
         vector<int> terminals;
         for (int i = 0; i < variables.size(); ++i) {
             if (variables[i][i][0]) {
@@ -226,14 +228,16 @@ void SAT::print_all_beautiful_solutions(const Game & game) {
             std::cout << el << " ";
         }
         if (cnt_components[my_terminals[i]].size() > 1) {
+            std::cout << "\x1b[32;1m"; // Print in bold green
             std::cout << " IT'S A CYCLE";
+            std::cout << "\x1b[0m"; // Reset color
         }
         std::cout << "\n \n";
     }
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << num_solutions++ << '\n';
+        cout << "Solution #" << ++num_solutions << '\n';
         vector<int> terminals;
         for (int i = 0; i < variables.size(); ++i) {
             if (variables[i][i][0]) {
