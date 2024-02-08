@@ -12,7 +12,6 @@ public:
 	void add_edge(int, int);
 	void set_player(int, int);
     vector<Strategy> generate_strategies() const;
-    vector<Strategy> neighbour_strategies(Strategy) const;
     vector<int> get_terminal_components() const;
     vector<Strategy> neighbour_strategies(Strategy, int) const;
 	void fill_components();
