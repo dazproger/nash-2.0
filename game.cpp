@@ -166,6 +166,9 @@ int Game::get_components_count() const {
 int Game::get_player_count() const {
     return player_cnt;
 }
+vector<int> Game::get_components() const {
+    return component;
+}
 
 int Game::play_strat(const Strategy& strat) const {
     return component[strat(start)];

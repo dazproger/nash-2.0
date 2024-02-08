@@ -20,9 +20,7 @@ public:
     int get_player_count() const;
     int get_vertices_count() const;
     int get_components_count() const;
-    vector<int> get_components() const{
-        return component;
-    }
+    vector<int> get_components() const;
 private:
 	vector<vector<int>> g;
 	vector<int> player;
