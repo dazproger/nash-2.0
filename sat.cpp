@@ -1,5 +1,5 @@
 #include "sat.h"
-#include <format>
+// #include <format>
 
 SAT::SAT(const Game &game) {
     variables.resize(game.get_components_count());
@@ -18,7 +18,7 @@ SAT::SAT(const Game &game) {
         for (int j = i + 1; j < terminals.size(); ++j) {
             for (int k = 0; k < game.get_player_count(); ++k) {
                 variables[terminals[i]][terminals[j]][k] =
-                    cp_model.NewBoolVar().WithName(format("X_{}_{}_{}", terminals[i], terminals[j], k));
+                    cp_model.NewBoolVar();//.WithName(format("X_{}_{}_{}", terminals[i], terminals[j], k));
             }
         }
     }
@@ -237,15 +237,49 @@ void SAT::print_all_beautiful_solutions(const Game & game) {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << ++num_solutions << '\n';
+        int k = variables[0][0].size();
+        vector<int> result(k, 0);
         vector<int> terminals;
         for (int i = 0; i < variables.size(); ++i) {
             if (variables[i][i][0]) {
                 terminals.push_back(i);
             }
         }
-        int k = variables[0][0].size();
-        vector<int> result(k, 0);
+        for (int player = 0; player < k; ++player) {
+            vector<int> order(my_terminals.size());
+            for (int i = 0; i < my_terminals.size();++i) {
+                int cnt_better = 0;
+                int cnt_better_without_cycles=0;
+                for (int j = 0; j < my_terminals.size();++j) {
+                    if (i == j)
+                        continue;
+                    cnt_better += SolutionBooleanValue(response, get_var(my_terminals[i], my_terminals[j], player));
+                    if (cnt_components[terminals[j]].size() == 1) {
+                        cnt_better_without_cycles += SolutionBooleanValue(response, get_var(my_terminals[i], my_terminals[j], player));
+                    }
+                }
+                order[cnt_better] = i+1;
+                if (cnt_components[terminals[i]].size() > 1) {
+                    result[player] = max(cnt_better_without_cycles, result[player]);
+                }
+            }
+        }
+        std::sort(result.begin(), result.end(), greater<>());
+
+        if (result.size() >= 2 && result[1] >= 3) {
+            return;
+        }
+
+        cout << "Solution #" << ++num_solutions << '\n';
+
+        k = variables[0][0].size();
+        result.assign(k, 0);
+        terminals.clear();
+        for (int i = 0; i < variables.size(); ++i) {
+            if (variables[i][i][0]) {
+                terminals.push_back(i);
+            }
+        }
         for (int player = 0; player < k; ++player) {
             vector<int> order(my_terminals.size());
             for (int i = 0; i < my_terminals.size();++i) {
@@ -273,6 +307,7 @@ void SAT::print_all_beautiful_solutions(const Game & game) {
             result[player] *= -1;
         }
         std::sort(result.begin(), result.end());
+
         cout << "Result:\n";
         for (auto el:result) {
             cout << el*-1 <<" ";

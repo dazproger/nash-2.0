@@ -3,7 +3,7 @@ project(nash_equilibrium)
 
 find_package(ortools CONFIG REQUIRED)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS -Wall)
 
 add_executable(sat-test sat-test.cpp)
