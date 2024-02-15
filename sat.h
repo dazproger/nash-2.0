@@ -16,14 +16,26 @@ public:
     void add_all_strategies(const Game&);
     // Adds a constraint that an outcome is better than another outcome for a fixed player
     void add_contraint(int, int, int);
+    // Add constraints that specify that a loop should not have a rank > 1
+    void minimize_loop_rank(int, int); // TODO: (Proabably should be done with CpModel::AddAtMostOne)
+    // Add constraints on all loops other from this to have rank <= 1
+    void minimize_all_except(int, int); // TODO
+    // Return an array of orders for all players, or an empty array if none was found
+    vector<vector<int>> return_results(const Game&); // TODO
+    // Checks if the SAT is solvable
+    bool is_solvalble(); // TODO
     // Solves the SAT and prints the results
     void solve();
     // Should add another function that extracts data from solved SAT
     void print_results();
-    void print_beautiful_results(const Game&);
+    /// Print any solution in human-readable way
+    void print_beautiful_results(const Game&); // TODO: fixes from Anton
     // Prints all solutions of SAT
     void print_all_solutions();
-    void print_all_beautiful_solutions(const Game&);
+    /// Print all solution in human-readable way
+    void print_all_beautiful_solutions(const Game&); // TODO: fixes from Anton
+    // Copy of print_all_beautiful_solutions, but prints only those permutations which are close to solving our problem
+    void print_all_solutions_close_to_c22(const Game&); // TODO: create and fix print_all_beautiful_solutions
     // Returns the X_ijk Boolean variable
     BoolVar get_var(int i, int j, int k);
 private:

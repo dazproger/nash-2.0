@@ -4,6 +4,9 @@
 
 using namespace std;
 
+// Recursive search of players; in g only the graph should be specified
+void generate_players(Game& g) { } // TODO
+
 int main() {
     int n;
     cout << "Input number of vertices: ";
@@ -33,7 +36,7 @@ int main() {
     SAT s(g);
     s.add_all_strategies(g);
     g.print_components();
-    s.add_contraint(5, 2, 2);
+    // s.add_contraint(5, 2, 2);
     // s.print_beautiful_results(g);
     s.print_all_beautiful_solutions(g);
     return 0;
