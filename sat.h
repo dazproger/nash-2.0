@@ -21,7 +21,7 @@ public:
     // Add constraints that specify that a loop should not have a rank > 1
     void minimize_loop_rank(int, int);
     // Add constraints on all loops other from this to have rank <= 1
-    void minimize_all_except(int, int); // TODO
+    void minimize_all_except(int, int, const Game&);
     // Return an array of orders for all players, or an empty array if none was found
     vector<vector<int>> return_results(const Game&); // TODO
     // Checks if the SAT is solvable

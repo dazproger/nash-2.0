@@ -67,6 +67,22 @@ void SAT::minimize_loop_rank(int cycle, int player) {
     cp_model.AddAtMostOne(clause);
 }
 
+void SAT::minimize_all_except(int good_cycle, int good_player, const Game& game) {
+    vector<int> terminals = game.get_terminal_components();
+    vector<int> component = game.get_components();
+    vector<int> cnt_component(game.get_components_count());
+    for (int i = 0; i < game.get_vertices_count(); ++i) {
+        ++cnt_component[component[i]];
+    }
+    for (auto terminal : terminals) {
+        if (cnt_component[terminal] <= 1) continue;
+        for (int player = 0; player < game.get_player_count(); ++player) {
+            if (player == good_player && terminal == good_cycle) continue;
+            minimize_loop_rank(terminal, player);
+        }
+    }
+}
+
 bool SAT::is_solvable() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
