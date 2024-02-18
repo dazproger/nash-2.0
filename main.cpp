@@ -44,7 +44,8 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
     if (!initial_sat.is_solvable()) {
-        cout << "\x1b[31;1mThere is a Nash Equlibirum((((\x1b[0m";
+        cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
+        return 0;
     }
     for (int i = 0; i < g.get_player_count(); ++i) {
         for (auto cycle : cycles) {
