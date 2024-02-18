@@ -9,6 +9,11 @@ SAT::SAT(const Game &game) {
             variables[i][j].resize(game.get_player_count());
         }
     }
+    vector<int> cnt_component = game.get_cnt_components();
+    is_cycle.resize(cnt_component.size());
+    for (int i = 0; i < cnt_component.size(); ++i) {
+        is_cycle[i] = cnt_component[i] > 1;
+    }
     vector<int> terminals = game.get_terminal_components();
     for (int i = 0; i < terminals.size(); ++i) {
         // Here we assume that an outcome can never be better than itself
@@ -53,13 +58,18 @@ void SAT::add_constraint(int i, int j, int k) {
     cp_model.AddBoolOr({get_var(i, j, k)});
 }
 
-void SAT::minimize_loop_rank(int cycle, int player) {
+static vector<int> get_terminals(const VariableTable& variables) {
     vector<int> terminals;
     for (int i = 0; i < variables.size(); ++i) {
         if (variables[i][i][0]) {
             terminals.push_back(i);
         }
     }
+    return terminals;
+}
+
+void SAT::minimize_loop_rank(int cycle, int player) {
+    vector<int> terminals = get_terminals(variables);
     vector<BoolVar> clause;
     for (auto terminal : terminals) {
         clause.push_back(get_var(cycle, terminal, player));
@@ -67,16 +77,12 @@ void SAT::minimize_loop_rank(int cycle, int player) {
     cp_model.AddAtMostOne(clause);
 }
 
-void SAT::minimize_all_except(int good_cycle, int good_player, const Game& game) {
-    vector<int> terminals = game.get_terminal_components();
-    vector<int> component = game.get_components();
-    vector<int> cnt_component(game.get_components_count());
-    for (int i = 0; i < game.get_vertices_count(); ++i) {
-        ++cnt_component[component[i]];
-    }
+void SAT::minimize_all_except(int good_cycle, int good_player) {
+    vector<int> terminals = get_terminals(variables);
+    int player_count = variables[0][0].size();
     for (auto terminal : terminals) {
-        if (cnt_component[terminal] <= 1) continue;
-        for (int player = 0; player < game.get_player_count(); ++player) {
+        if (!is_cycle[terminal]) continue;
+        for (int player = 0; player < player_count; ++player) {
             if (player == good_player && terminal == good_cycle) continue;
             minimize_loop_rank(terminal, player);
         }
@@ -118,12 +124,7 @@ static BoolVar get_var(int i, int j, int k, const VariableTable &variables) {
 }
 
 static void print_usual(const CpSolverResponse &response, const VariableTable &variables) {
-    vector<int> terminals;
-    for (int i = 0; i < variables.size(); ++i) {
-        if (variables[i][i][0]) {
-            terminals.push_back(i);
-        }
-    }
+    vector<int> terminals = get_terminals(variables);
     int k = variables[0][0].size();
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
@@ -144,17 +145,9 @@ static void print_usual(const CpSolverResponse &response, const VariableTable &v
     }
 }
 
-static vector<int> get_ranks(const CpSolverResponse& response, const VariableTable& variables, const Game& game) {
-    int n_comps = game.get_components_count();  // Number of components
-    int n_verts = game.get_vertices_count();    // Number of vertexes
-    auto component = game.get_components();     // colors of vertexes
-    vector<vector<int>> components(n_comps);    // Vertices grouped by components
-
-    for (int i = 0; i < n_verts; ++i) {
-        components[component[i]].push_back(i);
-    }
-    vector<int> terminals = game.get_terminal_components();
-    int k = game.get_player_count();
+static vector<int> get_ranks(const CpSolverResponse& response, const VariableTable& variables, const vector<bool>& is_cycle) {
+    vector<int> terminals = get_terminals(variables);
+    int k = variables[0][0].size();
     vector<int> result;
     for (int player = 0; player < k; ++player) {
         for (int i = 0; i < terminals.size(); ++i) {
@@ -162,12 +155,12 @@ static vector<int> get_ranks(const CpSolverResponse& response, const VariableTab
             for (int j = 0; j < terminals.size(); ++j) {
                 if (i == j)
                     continue;
-                if (components[terminals[j]].size() == 1) {
+                if (!is_cycle[terminals[i]]) {
                     cnt_better_without_cycles +=
                         SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
                 }
             }
-            if (components[terminals[i]].size() > 1) {
+            if (is_cycle[terminals[i]]) {
                 result.push_back(max(cnt_better_without_cycles, result[player]));
             }
         }
@@ -176,17 +169,10 @@ static vector<int> get_ranks(const CpSolverResponse& response, const VariableTab
     return result;
 }
 
-static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables, const Game &game) {
-    int n_comps = game.get_components_count();  // Number of components
-    int n_verts = game.get_vertices_count();    // Number of vertexes
-    auto component = game.get_components();     // colors of vertexes
-    vector<vector<int>> components(n_comps);    // Vertices grouped by components
-
-    for (int i = 0; i < n_verts; ++i) {
-        components[component[i]].push_back(i);
-    }
-    vector<int> terminals = game.get_terminal_components();
-    int k = game.get_player_count();
+static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables) {
+    vector<vector<int>> components(variables.size());    // Vertices grouped by components
+    vector<int> terminals = get_terminals(variables);
+    int k = variables[0][0].size();
     vector<int> result(k, 0);
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
@@ -230,14 +216,14 @@ void SAT::print_results() {
     }
     print_usual(response, variables);
 }
-void SAT::print_beautiful_results(const Game &game) {
+void SAT::print_beautiful_results() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
     if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
         cout << "There always will be a Nash Equilibrium" << endl;
         return;
     }
-    print_beautiful(response, variables, game);
+    print_beautiful(response, variables);
 }
 
 void SAT::print_all_solutions() {
@@ -252,13 +238,12 @@ void SAT::print_all_solutions() {
     model.Add(NewSatParameters(parameters));
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
 }
-void SAT::print_all_beautiful_solutions(const Game &game) {
-    game.print_terminal_descriptions();
+void SAT::print_all_beautiful_solutions() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
         cout << "Solution #" << ++num_solutions << '\n';
-        print_beautiful(response, variables, game);
+        print_beautiful(response, variables);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;
@@ -267,17 +252,16 @@ void SAT::print_all_beautiful_solutions(const Game &game) {
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
 }
 
-void SAT::print_all_solutions_close_to_c22(const Game& game) {
-    game.print_terminal_descriptions();
+void SAT::print_all_solutions_close_to_c22() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
         cout << "Solution #" << ++num_solutions << '\n';
-        vector<int> ranks = get_ranks(response, variables, game);
+        vector<int> ranks = get_ranks(response, variables, is_cycle);
         if (ranks[1] > 3) {
             return;
         }
-        print_beautiful(response, variables, game);
+        print_beautiful(response, variables);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;

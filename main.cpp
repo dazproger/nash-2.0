@@ -38,6 +38,7 @@ int main() {
     // g.print_components();
     // s.add_constraint(5, 2, 2);
     // s.print_beautiful_results(g);
-    s.print_all_beautiful_solutions(g);
+    g.print_terminal_descriptions();
+    s.print_all_beautiful_solutions();
     return 0;
 }

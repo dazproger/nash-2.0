@@ -76,10 +76,7 @@ void Game::fill_components() {
 }
 
 void Game::print_terminal_descriptions() const {
-    vector<vector<int>> components(get_vertices_count()); // Vertices grouped by components
-    for (int i = 0; i < get_vertices_count(); ++i) {
-        components[component[i]].push_back(i);
-    }
+    vector<vector<int>> components = get_components(); // Vertices grouped by components
     std::cout << "Terminals description:\n";
     vector<int> my_terminals = get_terminal_components();
     for (size_t i = 0; i < my_terminals.size(); ++i) {
@@ -111,14 +108,9 @@ void Game::print_components() const {
 }
 
 vector<int> Game::get_terminal_components() const {
-    int n_comps = get_components_count(); // Number of components
-    int n_verts = get_vertices_count(); // Number of vertexes
-    vector<int> cnt_components(n_comps); // cnt_components[i] - number of vertexes in component i
-    for (int i = 0; i < n_verts; ++i) {
-        ++cnt_components[component[i]];
-    }
-    vector<int> is_terminal(n_comps);
-    for (int i = 0; i < n_comps; ++i) {
+    vector<int> cnt_components = get_cnt_components();
+    vector<int> is_terminal(get_components_count());
+    for (int i = 0; i < get_components_count(); ++i) {
         is_terminal[i] = cnt_components[i] > 2;
         for (int destination_component : component_graph[i]) {
             is_terminal[i] |= (destination_component == i);
@@ -187,8 +179,21 @@ int Game::get_components_count() const {
 int Game::get_player_count() const {
     return player_cnt;
 }
-vector<int> Game::get_components() const {
-    return component;
+
+vector<vector<int>> Game::get_components() const {
+    vector<vector<int>> vertices_grouped_by_components(get_components_count());
+    for (int i = 0; i < get_vertices_count(); ++i) {
+        vertices_grouped_by_components[component[i]].push_back(i);
+    }
+    return vertices_grouped_by_components;
+}
+
+vector<int> Game::get_cnt_components() const {
+    vector<int> cnt_components(get_components_count());
+    for (int i = 0; i < get_vertices_count(); ++i) {
+        ++cnt_components[component[i]];
+    }
+    return cnt_components;
 }
 
 int Game::play_strat(const Strategy& strat) const {
