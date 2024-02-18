@@ -169,11 +169,10 @@ static vector<int> get_ranks(const CpSolverResponse& response, const VariableTab
     return result;
 }
 
-static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables) {
-    vector<vector<int>> components(variables.size());    // Vertices grouped by components
+static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables, vector<bool> is_cycle) {
     vector<int> terminals = get_terminals(variables);
     int k = variables[0][0].size();
-    vector<int> result(k, 0);
+    vector<int> result;
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
         for (int i = 0; i < terminals.size(); ++i) {
@@ -183,14 +182,14 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
                 if (i == j)
                     continue;
                 cnt_better += SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
-                if (components[terminals[j]].size() == 1) {
+                if (!is_cycle[terminals[i]]) {
                     cnt_better_without_cycles +=
                         SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
                 }
             }
             order[cnt_better] = i + 1;
-            if (components[terminals[i]].size() > 1) {
-                result[player] = max(cnt_better_without_cycles, result[player]);
+            if (is_cycle[terminals[i]]) {
+                result.push_back(max(cnt_better_without_cycles, result[player]));
             }
         }
         cout << "Order for player " << player + 1 << ": ";
@@ -223,7 +222,7 @@ void SAT::print_beautiful_results() {
         cout << "There always will be a Nash Equilibrium" << endl;
         return;
     }
-    print_beautiful(response, variables);
+    print_beautiful(response, variables, is_cycle);
 }
 
 void SAT::print_all_solutions() {
@@ -243,7 +242,7 @@ void SAT::print_all_beautiful_solutions() {
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
         cout << "Solution #" << ++num_solutions << '\n';
-        print_beautiful(response, variables);
+        print_beautiful(response, variables, is_cycle);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;
@@ -261,7 +260,7 @@ void SAT::print_all_solutions_close_to_c22() {
         if (ranks[1] > 3) {
             return;
         }
-        print_beautiful(response, variables);
+        print_beautiful(response, variables, is_cycle);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;
