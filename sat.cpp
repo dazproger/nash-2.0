@@ -155,13 +155,13 @@ static vector<int> get_ranks(const CpSolverResponse& response, const VariableTab
             for (int j = 0; j < terminals.size(); ++j) {
                 if (i == j)
                     continue;
-                if (!is_cycle[terminals[i]]) {
+                if (!is_cycle[terminals[j]]) {
                     cnt_better_without_cycles +=
                         SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
                 }
             }
             if (is_cycle[terminals[i]]) {
-                result.push_back(max(cnt_better_without_cycles, result[player]));
+                result.push_back(cnt_better_without_cycles);
             }
         }
     }
@@ -182,14 +182,14 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
                 if (i == j)
                     continue;
                 cnt_better += SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
-                if (!is_cycle[terminals[i]]) {
+                if (!is_cycle[terminals[j]]) {
                     cnt_better_without_cycles +=
                         SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
                 }
             }
             order[cnt_better] = i + 1;
             if (is_cycle[terminals[i]]) {
-                result.push_back(max(cnt_better_without_cycles, result[player]));
+                result.push_back(cnt_better_without_cycles);
             }
         }
         cout << "Order for player " << player + 1 << ": ";
