@@ -16,6 +16,7 @@ public:
     vector<Strategy> neighbour_strategies(Strategy, int) const;
 	void fill_components();
     void print_components() const;
+    void print_terminal_descriptions() const;
     int play_strat(const Strategy&) const;
     int get_player_count() const;
     int get_vertices_count() const;

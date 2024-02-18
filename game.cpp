@@ -75,6 +75,27 @@ void Game::fill_components() {
     }
 }
 
+void Game::print_terminal_descriptions() const {
+    vector<vector<int>> components(get_vertices_count()); // Vertices grouped by components
+    for (int i = 0; i < get_vertices_count(); ++i) {
+        components[component[i]].push_back(i);
+    }
+    std::cout << "Terminals description:\n";
+    vector<int> my_terminals = get_terminal_components();
+    for (size_t i = 0; i < my_terminals.size(); ++i) {
+        std::cout << "Terminal number " << i + 1 << " contains vertexes:\n";
+        for (auto el : components[my_terminals[i]]) {
+            std::cout << el + 1 << " ";
+        }
+        if (components[my_terminals[i]].size() > 1) {
+            std::cout << "\x1b[32;1m";  // Print in bold green
+            std::cout << " IT'S A CYCLE";
+            std::cout << "\x1b[0m";  // Reset color
+        }
+        std::cout << "\n";
+    }
+}
+
 void Game::print_components() const {
     vector<vector<int>> components(get_components_count());
     for (int i = 0; i < get_vertices_count(); ++i) {

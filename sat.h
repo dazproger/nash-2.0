@@ -5,6 +5,8 @@
 using namespace operations_research::sat;
 using namespace std;
 
+typedef vector<vector<vector<optional<BoolVar>>>> VariableTable;
+
 class SAT {
 public:
     // Creates SAT by Game. After this constructor SAT should already have all X_ijk variables created and all triangle restrictions should be added.
@@ -40,5 +42,5 @@ public:
     BoolVar get_var(int i, int j, int k);
 private:
     CpModelBuilder cp_model;
-    vector<vector<vector<optional<BoolVar>>>> variables;
+    VariableTable variables;
 };
