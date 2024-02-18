@@ -144,6 +144,38 @@ static void print_usual(const CpSolverResponse &response, const VariableTable &v
     }
 }
 
+static vector<int> get_ranks(const CpSolverResponse& response, const VariableTable& variables, const Game& game) {
+    int n_comps = game.get_components_count();  // Number of components
+    int n_verts = game.get_vertices_count();    // Number of vertexes
+    auto component = game.get_components();     // colors of vertexes
+    vector<vector<int>> components(n_comps);    // Vertices grouped by components
+
+    for (int i = 0; i < n_verts; ++i) {
+        components[component[i]].push_back(i);
+    }
+    vector<int> terminals = game.get_terminal_components();
+    int k = game.get_player_count();
+    vector<int> result;
+    for (int player = 0; player < k; ++player) {
+        for (int i = 0; i < terminals.size(); ++i) {
+            int cnt_better_without_cycles = 0;
+            for (int j = 0; j < terminals.size(); ++j) {
+                if (i == j)
+                    continue;
+                if (components[terminals[j]].size() == 1) {
+                    cnt_better_without_cycles +=
+                        SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
+                }
+            }
+            if (components[terminals[i]].size() > 1) {
+                result.push_back(max(cnt_better_without_cycles, result[player]));
+            }
+        }
+    }
+    std::sort(result.begin(), result.end(), greater<>());
+    return result;
+}
+
 static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables, const Game &game) {
     int n_comps = game.get_components_count();  // Number of components
     int n_verts = game.get_vertices_count();    // Number of vertexes
@@ -234,6 +266,26 @@ void SAT::print_all_beautiful_solutions(const Game &game) {
     model.Add(NewSatParameters(parameters));
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
 }
+
+void SAT::print_all_solutions_close_to_c22(const Game& game) {
+    game.print_terminal_descriptions();
+    Model model;
+    int num_solutions = 0;
+    model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
+        cout << "Solution #" << ++num_solutions << '\n';
+        vector<int> ranks = get_ranks(response, variables, game);
+        if (ranks[1] > 3) {
+            return;
+        }
+        print_beautiful(response, variables, game);
+        cout << "\n////////////////////////////////////////////////////////////////////////////\n";
+    }));
+    SatParameters parameters;
+    parameters.set_enumerate_all_solutions(true);
+    model.Add(NewSatParameters(parameters));
+    const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
+}
+
 BoolVar SAT::get_var(int i, int j, int k) {
     return ::get_var(i, j, k, variables);
 }

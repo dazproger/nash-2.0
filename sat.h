@@ -22,8 +22,6 @@ public:
     void minimize_loop_rank(int, int);
     // Add constraints on all loops other from this to have rank <= 1
     void minimize_all_except(int, int, const Game&);
-    // Return an array of orders for all players, or an empty array if none was found
-    vector<vector<int>> return_results(const Game&); // TODO
     // Checks if the SAT is solvable
     bool is_solvable();
     // Solves the SAT and prints the results
@@ -37,7 +35,7 @@ public:
     /// Print all solution in human-readable way
     void print_all_beautiful_solutions(const Game&);
     // Copy of print_all_beautiful_solutions, but prints only those permutations which are close to solving our problem
-    void print_all_solutions_close_to_c22(const Game&); // TODO: create and fix print_all_beautiful_solutions
+    void print_all_solutions_close_to_c22(const Game&);
     // Returns the X_ijk Boolean variable
     BoolVar get_var(int i, int j, int k);
 private:
