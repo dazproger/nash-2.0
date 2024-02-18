@@ -86,7 +86,7 @@ void Game::print_terminal_descriptions() const {
         }
         if (components[my_terminals[i]].size() > 1) {
             std::cout << "\x1b[32;1m";  // Print in bold green
-            std::cout << " IT'S A CYCLE";
+            std::cout << " IT'S A CYCLE (component: " << my_terminals[i] << ")";
             std::cout << "\x1b[0m";  // Reset color
         }
         std::cout << "\n";

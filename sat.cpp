@@ -69,9 +69,16 @@ static vector<int> get_terminals(const VariableTable& variables) {
 }
 
 void SAT::minimize_loop_rank(int cycle, int player) {
+    if (!is_cycle[cycle]) {
+        cerr << "\x1b[31;1m";  // Print in bold red
+        cerr << "NOT A CYCLE" << endl;
+        cerr << "\x1b[0m";  // Reset color
+        return;
+    }
     vector<int> terminals = get_terminals(variables);
     vector<BoolVar> clause;
     for (auto terminal : terminals) {
+        if (terminal == cycle) continue;
         clause.push_back(get_var(cycle, terminal, player));
     }
     cp_model.AddAtMostOne(clause);
