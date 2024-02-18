@@ -53,6 +53,12 @@ void SAT::add_contraint(int i, int j, int k) {
     cp_model.AddBoolOr({get_var(i, j, k)});
 }
 
+bool SAT::is_solvable() {
+    Model model;
+    const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
+    return response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE;
+}
+
 void SAT::solve() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);

@@ -25,17 +25,17 @@ public:
     // Return an array of orders for all players, or an empty array if none was found
     vector<vector<int>> return_results(const Game&); // TODO
     // Checks if the SAT is solvable
-    bool is_solvalble(); // TODO
+    bool is_solvable();
     // Solves the SAT and prints the results
     void solve();
     // Should add another function that extracts data from solved SAT
     void print_results();
     /// Print any solution in human-readable way
-    void print_beautiful_results(const Game&); // TODO: fixes from Anton
+    void print_beautiful_results(const Game&);
     // Prints all solutions of SAT
     void print_all_solutions();
     /// Print all solution in human-readable way
-    void print_all_beautiful_solutions(const Game&); // TODO: fixes from Anton
+    void print_all_beautiful_solutions(const Game&);
     // Copy of print_all_beautiful_solutions, but prints only those permutations which are close to solving our problem
     void print_all_solutions_close_to_c22(const Game&); // TODO: create and fix print_all_beautiful_solutions
     // Returns the X_ijk Boolean variable
