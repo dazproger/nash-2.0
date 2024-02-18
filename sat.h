@@ -17,9 +17,9 @@ public:
     // Adds all strategies from the game
     void add_all_strategies(const Game&);
     // Adds a constraint that an outcome is better than another outcome for a fixed player
-    void add_contraint(int, int, int);
+    void add_constraint(int, int, int);
     // Add constraints that specify that a loop should not have a rank > 1
-    void minimize_loop_rank(int, int); // TODO: (Proabably should be done with CpModel::AddAtMostOne)
+    void minimize_loop_rank(int, int);
     // Add constraints on all loops other from this to have rank <= 1
     void minimize_all_except(int, int); // TODO
     // Return an array of orders for all players, or an empty array if none was found

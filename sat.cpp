@@ -49,8 +49,22 @@ SAT::SAT(const Game &game) {
     }
 }
 
-void SAT::add_contraint(int i, int j, int k) {
+void SAT::add_constraint(int i, int j, int k) {
     cp_model.AddBoolOr({get_var(i, j, k)});
+}
+
+void SAT::minimize_loop_rank(int cycle, int player) {
+    vector<int> terminals;
+    for (int i = 0; i < variables.size(); ++i) {
+        if (variables[i][i][0]) {
+            terminals.push_back(i);
+        }
+    }
+    vector<BoolVar> clause;
+    for (auto terminal : terminals) {
+        clause.push_back(get_var(cycle, terminal, player));
+    }
+    cp_model.AddAtMostOne(clause);
 }
 
 bool SAT::is_solvable() {
