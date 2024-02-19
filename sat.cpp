@@ -58,7 +58,7 @@ void SAT::add_constraint(int i, int j, int k) {
     cp_model.AddBoolOr({get_var(i, j, k)});
 }
 
-static vector<int> get_terminals(const VariableTable& variables) {
+static vector<int> get_terminals(const VariableTable &variables) {
     vector<int> terminals;
     for (int i = 0; i < variables.size(); ++i) {
         if (variables[i][i][0]) {
@@ -78,7 +78,8 @@ void SAT::minimize_loop_rank(int cycle, int player) {
     vector<int> terminals = get_terminals(variables);
     vector<BoolVar> clause;
     for (auto terminal : terminals) {
-        if (terminal == cycle) continue;
+        if (terminal == cycle)
+            continue;
         clause.push_back(get_var(cycle, terminal, player));
     }
     cp_model.AddAtMostOne(clause);
@@ -88,9 +89,11 @@ void SAT::minimize_all_except(int good_cycle, int good_player) {
     vector<int> terminals = get_terminals(variables);
     int player_count = variables[0][0].size();
     for (auto terminal : terminals) {
-        if (!is_cycle[terminal]) continue;
+        if (!is_cycle[terminal])
+            continue;
         for (int player = 0; player < player_count; ++player) {
-            if (player == good_player && terminal == good_cycle) continue;
+            if (player == good_player && terminal == good_cycle)
+                continue;
             minimize_loop_rank(terminal, player);
         }
     }
@@ -152,7 +155,8 @@ static void print_usual(const CpSolverResponse &response, const VariableTable &v
     }
 }
 
-static vector<int> get_ranks(const CpSolverResponse& response, const VariableTable& variables, const vector<bool>& is_cycle) {
+static vector<int> get_ranks(const CpSolverResponse &response, const VariableTable &variables,
+                             const vector<bool> &is_cycle) {
     vector<int> terminals = get_terminals(variables);
     int k = variables[0][0].size();
     vector<int> result;
@@ -201,7 +205,12 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
         }
         cout << "Order for player " << player + 1 << ": ";
         for (int i = 0; i < order.size(); ++i) {
-            cout << (i ? " < " : "") << order[i];
+            cout << (i ? " < " : "");
+            if (is_cycle[terminals[order[i] - 1]])
+                cout << "\x1b[32;1m";
+            cout << order[i];
+            if (is_cycle[terminals[order[i] - 1]])
+                cout << "\x1b[0m";
         }
         cout << '\n';
     }
@@ -262,11 +271,11 @@ void SAT::print_all_solutions_close_to_c22() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << ++num_solutions << '\n';
         vector<int> ranks = get_ranks(response, variables, is_cycle);
-        if (ranks[1] > 3) {
+        if (ranks[1] > 2) {
             return;
         }
+        cout << "Solution #" << ++num_solutions << '\n';
         print_beautiful(response, variables, is_cycle);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));

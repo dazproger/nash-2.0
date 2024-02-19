@@ -59,7 +59,9 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
             }
         }
     }
-    cout << "\x1b[31;1m((\x1b[0m";
+    cout << "\x1b[31;1m((\x1b[0m" << endl;
+    initial_sat.print_all_solutions_close_to_c22();
+    g.print_terminal_descriptions();
     // s.minimize_loop_rank(2, 2);
     // s.minimize_all_except(6, 2);
     // s.print_beautiful_results();
