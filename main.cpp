@@ -5,7 +5,7 @@
 using namespace std;
 
 // Recursive search of players; in g only the graph should be specified
-void generate_players(Game& g) { } // TODO
+bool generate_players(Game& g) { } //
 
 int main(int argc, __attribute__((unused)) char* argv[]) {
     int n;
@@ -53,16 +53,17 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
             s.add_all_strategies(g);
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
-                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m";
+                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m\n";
                 s.print_beautiful_results();
                 return 0;
             }
         }
     }
-    cout << "\x1b[31;1m((\x1b[0m";
+    cout << "\x1b[31;1m((\x1b[0m\n";
     // s.minimize_loop_rank(2, 2);
     // s.minimize_all_except(6, 2);
     // s.print_beautiful_results();
     // s.print_all_beautiful_solutions();
+    initial_sat.print_all_solutions_close_to_c22();
     return 0;
 }

@@ -262,11 +262,11 @@ void SAT::print_all_solutions_close_to_c22() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << ++num_solutions << '\n';
         vector<int> ranks = get_ranks(response, variables, is_cycle);
-        if (ranks[1] > 3) {
+        if (ranks[1] > 2) {
             return;
         }
+        cout << "Solution #" << ++num_solutions << '\n';
         print_beautiful(response, variables, is_cycle);
         cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
