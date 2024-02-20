@@ -53,7 +53,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
             s.add_all_strategies(g);
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
-                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m";
+                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m\n";
                 s.print_beautiful_results();
                 return 0;
             }
