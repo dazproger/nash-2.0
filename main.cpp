@@ -4,43 +4,30 @@
 
 using namespace std;
 
-// Recursive search of players; in g only the graph should be specified
-void generate_players(Game& g) { } // TODO
+void solve(const Game& g);
 
-int main(int argc, __attribute__((unused)) char* argv[]) {
-    int n;
-    if (argc <= 1) cout << "Input number of vertices: ";
-    cin >> n;
-    int start;
-    if (argc <= 1) cout << "Input starting vertex: ";
-    cin >> start;
-    --start;
-    Game g(n, start);
-    if (argc <= 1) cout << "Input players corresponding to vertices: ";
-    for (int i = 0; i < n; ++i) {
-        int player;
-        cin >> player;
-        g.set_player(i, player - 1);
-    }
-    if (argc <= 1) cout << "Input number of edges: ";
-    int m;
-    cin >> m;
-    if (argc <= 1) cout << "Input edges (m lines):\n";
-    while (m--) {
-        int a, b;
-        cin >> a >> b;
-        --a;--b;
-        g.add_edge(a, b);
-    }
-    g.fill_components();
-    vector<int> cnt_components = g.get_cnt_components();
-    vector<int> cycles;
-    for (int i = 0; i < g.get_components_count(); ++i) {
-        if (cnt_components[i] > 1) {
-            cycles.push_back(i);
+void rec(vector<int>& pref, int num_last, Game& g) {
+    if (pref.size() == g.get_vertices_count()) {
+        for (int v = 0; v < g.get_vertices_count(); ++v) {
+            g.set_player(v, pref[v]);
         }
+        solve(g);
+        return;
     }
-    g.print_terminal_descriptions();
+    for (int player = 0; player <= num_last; ++player) {
+        pref.push_back(player);
+        rec(pref, num_last + (player == num_last), g);
+        pref.pop_back();
+    }
+}
+
+// Recursive search of players; in g only the graph should be specified
+void generate_players(Game& g) {
+    vector<int> pref;
+    rec(pref, 0, g);
+}
+
+void solve(const Game& g) {
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
     if (!initial_sat.is_solvable()) {
@@ -66,5 +53,30 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     // s.minimize_all_except(6, 2);
     // s.print_beautiful_results();
     // s.print_all_beautiful_solutions();
+}
+
+int main(int argc, __attribute__((unused)) char* argv[]) {
+    int n;
+    if (argc <= 1) cout << "Input number of vertices: ";
+    cin >> n;
+    int start;
+    if (argc <= 1) cout << "Input starting vertex: ";
+    cin >> start;
+    --start;
+    Game g(n, start);
+    if (argc <= 1) cout << "Input players corresponding to vertices: ";
+    if (argc <= 1) cout << "Input number of edges: ";
+    int m;
+    cin >> m;
+    if (argc <= 1) cout << "Input edges (m lines):\n";
+    while (m--) {
+        int a, b;
+        cin >> a >> b;
+        --a;--b;
+        g.add_edge(a, b);
+    }
+    g.set_graph_info();
+    g.print_terminal_descriptions();
+    generate_players(g);
     return 0;
 }

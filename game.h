@@ -23,6 +23,7 @@ public:
     int get_components_count() const;
     vector<vector<int>> get_components() const;
     vector<int> get_cnt_components() const;
+    void set_graph_info();
 private:
 	vector<vector<int>> g;
 	vector<int> player;
@@ -30,4 +31,6 @@ private:
 	vector<vector<int>> component_graph;
 	int start;
     int player_cnt = 0;
+    vector<int> cnt_components;
+    vector<int> cycles;
 };

@@ -199,3 +199,13 @@ vector<int> Game::get_cnt_components() const {
 int Game::play_strat(const Strategy& strat) const {
     return component[strat(start)];
 }
+
+void Game::set_graph_info() {
+    g.fill_components();
+    cnt_components = g.get_cnt_components();
+    for (int i = 0; i < g.get_components_count(); ++i) {
+        if (cnt_components[i] > 1) {
+            cycles.push_back(i);
+        }
+    }
+}
