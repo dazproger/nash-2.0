@@ -200,12 +200,24 @@ int Game::play_strat(const Strategy& strat) const {
     return component[strat(start)];
 }
 
+vector<int> Game::get_cycles() const {
+    return cycles;
+}
+
+void Game::reset_max_player() {
+    player_cnt = 0;
+}
+
 void Game::set_graph_info() {
-    g.fill_components();
-    cnt_components = g.get_cnt_components();
-    for (int i = 0; i < g.get_components_count(); ++i) {
+    fill_components();
+    cnt_components = get_cnt_components();
+    for (int i = 0; i < get_components_count(); ++i) {
         if (cnt_components[i] > 1) {
             cycles.push_back(i);
         }
     }
+}
+
+bool Game::is_leaf(int v) const {
+    return component_graph[component[v]].size() == 1 && component_graph[component[v]][0] == component[v];
 }
