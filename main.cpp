@@ -24,7 +24,7 @@ int solve(const Game& g) {
         }
     }
     // cout << "\x1b[31;1m((\x1b[0m" << endl;
-    // initial_sat.print_all_solutions_close_to_c22();
+    // print_all_achieve_ranks({2, 2, 0}, g);
     // g.print_terminal_descriptions();
     // s.minimize_loop_rank(2, 2);
     // s.minimize_all_except(6, 2);
@@ -45,6 +45,7 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
                 cout << elem + 1 << ' ';
             }
             cout << endl;
+            cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
         }
         g.reset_max_player();
         return;
@@ -59,7 +60,7 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         pref.push_back(player);
         cnt_used += used[player] == 0;
         used[player]++;
-        rec(pref, used, cnt_used, num_last + (player == num_last), g);
+        rec(pref, used, cnt_used, num_last + (player == num_last) - (num_last == 3), g);
         used[player]--;
         cnt_used -= used[player] == 0;
         pref.pop_back();
@@ -83,7 +84,12 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    Game g(n, start);
+    const int amount_of_terminals = 6;
+    int amount_of_games = 1 << amount_of_terminals;
+    vector<Game> games;
+    for (int i = 0; i < amount_of_games;++i) {
+        games.emplace_back(n - amount_of_terminals + popcount(static_cast<uint>(i)), start);
+    }
     // if (argc <= 1)
     //     cout << "Input players corresponding to vertices: ";
     if (argc <= 1)
@@ -93,15 +99,30 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     if (argc <= 1)
         cout << "Input edges (m lines):\n";
     while (m--) {
+
         int a, b;
         cin >> a >> b;
         --a;
         --b;
-        g.add_edge(a, b);
+        if (b < n - amount_of_terminals) {
+            for (auto& el: games) {
+                el.add_edge(a, b);
+            }
+        }
+        else {
+            auto exp = n - b-1;
+            for (int i = 0; i < amount_of_games; ++i) {
+                if ((i>>exp) & 1) {
+                    games[i].add_edge(a, n - amount_of_terminals + popcount(static_cast<uint>(i >> exp))-1);
+                }
+            }
+        }
     }
-    g.set_graph_info();
-    g.print_terminal_descriptions();
-    generate_players(g);
-    g.print_terminal_descriptions();
+    for (int i = 1; i < amount_of_games; ++i) {
+        cout << "\x1b[31;1mCASE № \x1b[0m" << bitset<amount_of_terminals>(i) << "\n";
+        games[i].set_graph_info();
+        games[i].print_terminal_descriptions();
+        generate_players(games[i]);
+    }
     return 0;
 }
