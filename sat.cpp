@@ -349,3 +349,16 @@ void SAT::add_all_strategies(const Game &game) {
         add_strategy(strat, game);
     }
 }
+
+bool try_achieve_ranks(vector<int> ranks, const Game &g) {
+    sort(ranks.begin(), ranks.end());
+    do {
+        SAT s(g);
+        s.add_all_strategies(g);
+        s.limit_many_loop_ranks(ranks);
+        if (s.is_solvable()) {
+            return true;
+        }
+    } while (next_permutation(ranks.begin(), ranks.end()));
+    return false;
+}

@@ -47,3 +47,5 @@ private:
     CpModelBuilder cp_model;
     VariableTable variables;
 };
+
+bool try_achieve_ranks(vector<int>, const Game&);
