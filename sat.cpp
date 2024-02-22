@@ -99,6 +99,47 @@ void SAT::minimize_all_except(int good_cycle, int good_player) {
     }
 }
 
+void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
+    vector<int> terminals = get_terminals(variables);
+    vector<int> non_cycles;
+    for (const auto& terminal : terminals)  {
+        if (!is_cycle[terminal]) {
+            non_cycles.push_back(terminal);
+        }
+    }
+    vector<int> mask(non_cycles.size(), 0);
+    ++rank;
+    for (int i = 0; i < rank; ++i) {
+        mask[mask.size() - 1 - i] = 1;
+    }
+    do {
+        vector<BoolVar> clause;
+        for (int i = 0; i < mask.size(); ++i) {
+            if (mask[i]) {
+                clause.push_back(get_var(non_cycles[i], cycle, player));
+            }
+        }
+        cp_model.AddBoolOr(clause);
+    } while (next_permutation(mask.begin(), mask.end()));
+}
+
+void SAT::limit_many_loop_ranks(vector<int> ranks) {
+    int player_cnt = variables[0][0].size();
+    vector<int> cycles;
+    for (const auto& terminal : get_terminals(variables)) {
+        if (is_cycle[terminal]) {
+            cycles.push_back(terminal);
+        }
+    }
+    assert(cycles.size() * player_cnt == ranks.size());
+    int cur_rank = 0;
+    for (int i = 0; i < player_cnt; ++i) {
+        for (auto cycle : cycles) {
+            limit_one_loop_rank(cycle, i, ranks[cur_rank++]);
+        }
+    }
+}
+
 bool SAT::is_solvable() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
