@@ -380,6 +380,9 @@ void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
 
 void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
     sort(ranks.begin(), ranks.end());
+    for (size_t i = ranks.size(); i < g.get_player_count();++i) {
+        ranks.push_back(ranks.back());
+    }
     do {
         SAT s(g);
         s.add_all_strategies(g);
