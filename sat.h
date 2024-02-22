@@ -22,6 +22,10 @@ public:
     void minimize_loop_rank(int, int);
     // Add constraints on all loops other from this to have rank <= 1
     void minimize_all_except(int, int);
+    // Limits a rank of a loop for a player with the given amount
+    void limit_one_loop_rank(int, int, int);
+    // Limits all ranks with the given ranks
+    void limit_many_loop_ranks(vector<int>);
     // Checks if the SAT is solvable
     bool is_solvable();
     // Solves the SAT and prints the results
