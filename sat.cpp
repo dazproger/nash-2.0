@@ -107,6 +107,7 @@ void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
             non_cycles.push_back(terminal);
         }
     }
+    if (rank >= non_cycles.size()) return;
     vector<int> mask(non_cycles.size(), 0);
     ++rank;
     for (int i = 0; i < rank; ++i) {
@@ -361,4 +362,36 @@ bool try_achieve_ranks(vector<int> ranks, const Game &g) {
         }
     } while (next_permutation(ranks.begin(), ranks.end()));
     return false;
+}
+
+void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
+    sort(ranks.begin(), ranks.end());
+    do {
+        SAT s(g);
+        s.add_all_strategies(g);
+        s.limit_many_loop_ranks(ranks);
+        if (s.is_solvable()) {
+            s.print_beautiful_results();
+            return;
+        }
+    } while (next_permutation(ranks.begin(), ranks.end()));
+    cout << "No res :sad_face:" << endl;
+}
+
+void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
+    sort(ranks.begin(), ranks.end());
+    do {
+        SAT s(g);
+        s.add_all_strategies(g);
+        s.limit_many_loop_ranks(ranks);
+        if (s.is_solvable()) {
+            s.print_all_beautiful_solutions();
+        }
+    } while (next_permutation(ranks.begin(), ranks.end()));
+}
+
+void print_all_solutions_close_to_c22(const Game &g) {
+    vector<int> ranks(g.get_cycles().size() * g.get_player_count(), 2);
+    ranks[0] = static_cast<int>(1e9) + 10;
+    print_all_achieve_ranks(ranks, g);
 }

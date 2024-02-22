@@ -49,3 +49,5 @@ private:
 };
 
 bool try_achieve_ranks(vector<int>, const Game&);
+void print_example_achieve_ranks(vector<int>, const Game&);
+void print_all_achieve_ranks(vector<int>, const Game&);
