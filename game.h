@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_set>
 
 #include "strategy.h"
 
@@ -13,7 +14,8 @@ public:
 	void set_player(int, int);
     vector<Strategy> generate_strategies() const;
     vector<int> get_terminal_components() const;
-    vector<Strategy> neighbour_strategies(Strategy, int) const;
+    vector<Strategy> neighbour_strategies(const Strategy&, int) const;
+    unordered_set<int> neighbour_strategies_outcomes(const Strategy&, int) const;
 	void fill_components();
     void print_components() const;
     void print_terminal_descriptions() const;
@@ -34,6 +36,6 @@ private:
 	vector<vector<int>> component_graph;
 	int start;
     int player_cnt = 0;
-    vector<int> cnt_components;
+    vector<int> cnt_components_;
     vector<int> cycles;
 };

@@ -3,7 +3,7 @@
 #include "sat.h"
 
 using namespace std;
-
+static int permutations = 0;
 int solve(const Game& g) {
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
@@ -45,11 +45,12 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         // g.reset_max_player();
         // return;
         if (solve(g)) {
-            for (auto elem : pref) {
-                cout << elem + 1 << ' ';
-            }
-            cout << endl;
-            cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
+            //for (auto elem : pref) {
+            //    cout << elem + 1 << ' ';
+            //}
+            //cout << endl;
+            //cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
+            ++permutations;
         }
         g.reset_max_player();
         return;
@@ -88,7 +89,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    const int amount_of_terminals = 0;
+    const int amount_of_terminals = 7;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
     for (int i = 0; i < amount_of_games;++i) {
@@ -127,6 +128,8 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         games[i].set_graph_info();
         games[i].print_terminal_descriptions();
         generate_players(games[i]);
+        cout << permutations << endl;
+        permutations = 0;
     }
     return 0;
 }

@@ -336,10 +336,15 @@ void SAT::add_strategy(const Strategy &strat, const Game &game) {
     int outcome = game.play_strat(strat);
     vector<BoolVar> or_clause;
     for (int k = 0; k < game.get_player_count(); ++k) {
-        for (const auto &neighbour_strat : game.neighbour_strategies(strat, k)) {
-            int other_outcome = game.play_strat(neighbour_strat);
+        //for (const auto &neighbour_strat : game.neighbour_strategies(strat, k)) {
+        //    int other_outcome = game.play_strat(neighbour_strat);
+        //    if (other_outcome == outcome)
+        //        continue;
+        //    or_clause.push_back(get_var(other_outcome, outcome, k));
+        //}
+        for (auto other_outcome : game.neighbour_strategies_outcomes(strat, k)) {
             if (other_outcome == outcome)
-                continue;
+                    continue;
             or_clause.push_back(get_var(other_outcome, outcome, k));
         }
     }

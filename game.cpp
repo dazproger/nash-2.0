@@ -108,7 +108,7 @@ void Game::print_components() const {
 }
 
 vector<int> Game::get_terminal_components() const {
-    vector<int> cnt_components = get_cnt_components();
+    vector<int> cnt_components = cnt_components_;
     vector<int> is_terminal(get_components_count());
     for (int i = 0; i < get_components_count(); ++i) {
         is_terminal[i] = cnt_components[i] > 2;
@@ -147,7 +147,7 @@ vector<Strategy> Game::generate_strategies() const {
     return strategies;
 }
 
-vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) const {
+vector<Strategy> Game::neighbour_strategies(const Strategy& strategy, int k) const {
     vector<Strategy> ans;
     for (int i = 0; i < get_vertices_count();++i) {
         if (player[i] == k) {
@@ -167,6 +167,30 @@ vector<Strategy> Game::neighbour_strategies(Strategy strategy, int k) const {
         }
     }
     return ans;
+}
+unordered_set<int> Game::neighbour_strategies_outcomes(const Strategy & strategy, int k) const {
+    unordered_set<int> superposition{start};
+    for (int i = 0;i < get_vertices_count();++i) {
+        unordered_set<int> new_superposition;
+        for (auto position : superposition) {
+            if (player[position] != k) {
+                new_superposition.emplace(strategy[position]);
+            } else {
+                for(auto move : g[position]) {
+                    new_superposition.emplace(move);
+                }
+                if (g[position].empty()) {
+                    new_superposition.emplace(position);
+                }
+            }
+        }
+        superposition = new_superposition;
+    }
+    unordered_set<int> outcomes;
+    for (auto position : superposition) {
+        outcomes.emplace(component[position]);
+    }
+    return outcomes;
 }
 
 int Game::get_vertices_count() const {
@@ -210,9 +234,9 @@ void Game::reset_max_player() {
 
 void Game::set_graph_info() {
     fill_components();
-    cnt_components = get_cnt_components();
+    cnt_components_ = get_cnt_components();
     for (int i = 0; i < get_components_count(); ++i) {
-        if (cnt_components[i] > 1) {
+        if (cnt_components_[i] > 1) {
             cycles.push_back(i);
         }
     }
