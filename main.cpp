@@ -17,7 +17,7 @@ int solve(const Game& g) {
             s.add_all_strategies(g);
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
-                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m\n";
+                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m" << endl;
                 s.print_beautiful_results();
                 exit(0);
             }
@@ -40,6 +40,9 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         for (int v = 0; v < g.get_vertices_count(); ++v) {
             g.set_player(v, pref[v]);
         }
+        // print_all_achieve_ranks({2, 2, 0}, g);
+        // g.reset_max_player();
+        // return;
         if (solve(g)) {
             for (auto elem : pref) {
                 cout << elem + 1 << ' ';
