@@ -11,10 +11,11 @@ int solve(const Game& g) {
         // cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
         return 0;
     }
+    SAT start_sat(g);
+    start_sat.add_all_strategies(g);
     for (int i = 0; i < g.get_player_count(); ++i) {
         for (const auto& cycle : g.get_cycles()) {
-            SAT s(g);
-            s.add_all_strategies(g);
+            SAT s = start_sat; // Pls God protect this line of code
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
                 cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m" << endl;
