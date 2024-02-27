@@ -2,7 +2,7 @@
 #pragma once
 #include <unordered_set>
 #include <vector>
-static int used[100];
+static int USED[100];
 using namespace std;
 struct Strategy {
 public:
@@ -14,12 +14,12 @@ public:
     }
     int operator()(int from) const {
         int cur = from;
-        while (!used[from]) {
-            used[from] = 1;
+        while (!USED[from]) {
+            USED[from] = 1;
             from = data_[from];
         }
-        while (used[cur]) {
-            used[cur] = 0;
+        while (USED[cur]) {
+            USED[cur] = 0;
             cur = data_[cur];
         }
         return from;
