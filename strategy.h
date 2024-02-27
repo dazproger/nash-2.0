@@ -1,8 +1,8 @@
 
 #pragma once
-
+#include <unordered_set>
 #include <vector>
-
+static int used[100];
 using namespace std;
 struct Strategy {
 public:
@@ -13,10 +13,14 @@ public:
         return data_[from];
     }
     int operator()(int from) const {
-        size_t cnt = 0;
-        while (cnt < data_.size() + 10) {
+        int cur = from;
+        while (!used[from]) {
+            used[from] = 1;
             from = data_[from];
-            ++cnt;
+        }
+        while (used[cur]) {
+            used[cur] = 0;
+            cur = data_[cur];
         }
         return from;
     }
@@ -25,7 +29,6 @@ public:
         data[index] = new_edge;
         return data;
     }
-
 private:
     vector<int> data_;
 };

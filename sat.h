@@ -51,3 +51,4 @@ private:
 bool try_achieve_ranks(vector<int>, const Game&);
 void print_example_achieve_ranks(vector<int>, const Game&);
 void print_all_achieve_ranks(vector<int>, const Game&);
+void print_all_solutions_close_to_c22(const Game &g);

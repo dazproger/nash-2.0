@@ -395,6 +395,6 @@ void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
 
 void print_all_solutions_close_to_c22(const Game &g) {
     vector<int> ranks(g.get_cycles().size() * g.get_player_count(), 2);
-    ranks[0] = static_cast<int>(1e9) + 10;
+    //ranks[0] = static_cast<int>(1e9) + 10;
     print_all_achieve_ranks(ranks, g);
 }
