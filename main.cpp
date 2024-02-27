@@ -11,13 +11,14 @@ int solve(const Game& g) {
         // cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
         return 0;
     }
+    SAT start_sat(g);
+    start_sat.add_all_strategies(g);
     for (int i = 0; i < g.get_player_count(); ++i) {
         for (const auto& cycle : g.get_cycles()) {
-            SAT s(g);
-            s.add_all_strategies(g);
+            SAT s = start_sat; // Pls God protect this line of code
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
-                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m\n";
+                cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m" << endl;
                 s.print_beautiful_results();
                 exit(0);
             }
@@ -40,6 +41,9 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         for (int v = 0; v < g.get_vertices_count(); ++v) {
             g.set_player(v, pref[v]);
         }
+        // print_all_achieve_ranks({2, 2, 0}, g);
+        // g.reset_max_player();
+        // return;
         if (solve(g)) {
             for (auto elem : pref) {
                 cout << elem + 1 << ' ';
@@ -84,7 +88,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    const int amount_of_terminals = 6;
+    const int amount_of_terminals = 0;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
     for (int i = 0; i < amount_of_games;++i) {

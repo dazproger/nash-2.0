@@ -78,7 +78,7 @@ void SAT::minimize_loop_rank(int cycle, int player) {
     vector<int> terminals = get_terminals(variables);
     vector<BoolVar> clause;
     for (auto terminal : terminals) {
-        if (terminal == cycle)
+        if (is_cycle[terminal])
             continue;
         clause.push_back(get_var(cycle, terminal, player));
     }
@@ -102,12 +102,13 @@ void SAT::minimize_all_except(int good_cycle, int good_player) {
 void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
     vector<int> terminals = get_terminals(variables);
     vector<int> non_cycles;
-    for (const auto& terminal : terminals)  {
+    for (const auto &terminal : terminals) {
         if (!is_cycle[terminal]) {
             non_cycles.push_back(terminal);
         }
     }
-    if (rank >= non_cycles.size()) return;
+    if (rank >= non_cycles.size())
+        return;
     vector<int> mask(non_cycles.size(), 0);
     ++rank;
     for (int i = 0; i < rank; ++i) {
@@ -127,7 +128,7 @@ void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
 void SAT::limit_many_loop_ranks(vector<int> ranks) {
     int player_cnt = variables[0][0].size();
     vector<int> cycles;
-    for (const auto& terminal : get_terminals(variables)) {
+    for (const auto &terminal : get_terminals(variables)) {
         if (is_cycle[terminal]) {
             cycles.push_back(terminal);
         }
@@ -352,6 +353,10 @@ void SAT::add_all_strategies(const Game &game) {
 }
 
 bool try_achieve_ranks(vector<int> ranks, const Game &g) {
+    int cnt_cycles = g.get_cycles().size();
+    for (size_t i = ranks.size(); i < g.get_player_count() * cnt_cycles; ++i) {
+        ranks.push_back(ranks.back());
+    }
     sort(ranks.begin(), ranks.end());
     do {
         SAT s(g);
@@ -365,6 +370,10 @@ bool try_achieve_ranks(vector<int> ranks, const Game &g) {
 }
 
 void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
+    int cnt_cycles = g.get_cycles().size();
+    for (size_t i = ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
+        ranks.push_back(ranks.back());
+    }
     sort(ranks.begin(), ranks.end());
     do {
         SAT s(g);
@@ -379,10 +388,11 @@ void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
 }
 
 void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
-    sort(ranks.begin(), ranks.end());
-    for (size_t i = ranks.size(); i < g.get_player_count();++i) {
+    int cnt_cycles = g.get_cycles().size();
+    for (size_t i = ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
         ranks.push_back(ranks.back());
     }
+    sort(ranks.begin(), ranks.end());
     do {
         SAT s(g);
         s.add_all_strategies(g);

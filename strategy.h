@@ -24,7 +24,7 @@ public:
         }
         return from;
     }
-    Strategy GetNewStrategy(int index, int new_edge) const {
+    [[nodiscard]] Strategy GetNewStrategy(int index, int new_edge) const {
         auto data = data_;
         data[index] = new_edge;
         return data;
