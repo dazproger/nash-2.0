@@ -1,9 +1,10 @@
 #include <iostream>
+#include <ctime>
 #include "game.h"
 #include "sat.h"
+#include <thread>
 
 using namespace std;
-static int permutations = 0;
 int solve(const Game& g) {
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
@@ -50,7 +51,6 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
             //}
             //cout << endl;
             //cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
-            ++permutations;
         }
         g.reset_max_player();
         return;
@@ -77,6 +77,12 @@ void generate_players(Game& g) {
     vector<int> pref;
     vector<int> used(g.get_vertices_count());
     rec(pref, used, 0, 0, g);
+}
+
+void check(Game game) {
+    game.set_graph_info();
+    game.print_terminal_descriptions();
+    generate_players(game);
 }
 
 int main(int argc, __attribute__((unused)) char* argv[]) {
@@ -123,13 +129,18 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
             }
         }
     }
-    for (int i = 1; i < amount_of_games; ++i) {
-        cout << "\x1b[31;1mCASE № \x1b[0m" << bitset<amount_of_terminals>(i) << "\n";
-        games[i].set_graph_info();
-        games[i].print_terminal_descriptions();
-        generate_players(games[i]);
-        cout << permutations << endl;
-        permutations = 0;
+    auto st = time(nullptr);
+    for (int i = 0; i < amount_of_games/8; ++i) {
+        vector<thread> threads;
+        for (int j = 1; j <= 8; ++j) {
+            if (8*i + j < amount_of_games) {
+                threads.emplace_back(check, games[8 * i + j]);
+            }
+        }
+        for (auto& thread : threads) {
+            thread.join();
+        }
     }
+    cout << difftime(time(nullptr), st) << endl;
     return 0;
 }

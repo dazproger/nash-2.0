@@ -10,12 +10,13 @@ using namespace std;
 class Game {
 public:
 	Game(int, int);
+    Game(const Game&);
 	void add_edge(int, int);
 	void set_player(int, int);
     vector<Strategy> generate_strategies() const;
     vector<int> get_terminal_components() const;
     vector<Strategy> neighbour_strategies(const Strategy&, int) const;
-    unordered_set<int> neighbour_strategies_outcomes(const Strategy&, int) const;
+    vector<int> neighbour_strategies_outcomes(const Strategy&, int) const;
 	void fill_components();
     void print_components() const;
     void print_terminal_descriptions() const;

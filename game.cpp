@@ -4,7 +4,13 @@
 
 Game::Game(int n, int start) : g(n), player(n), component(n), component_graph(n), start(start) {
 }
-
+Game::Game(const Game &other) {
+    g = other.g;
+    player = other.player;
+    component = other.component;
+    component_graph = other.component_graph;
+    start = other.start;
+}
 void Game::add_edge(int from, int to) {
     g[from].push_back(to);
 }
@@ -168,27 +174,34 @@ vector<Strategy> Game::neighbour_strategies(const Strategy& strategy, int k) con
     }
     return ans;
 }
-unordered_set<int> Game::neighbour_strategies_outcomes(const Strategy & strategy, int k) const {
-    unordered_set<int> superposition{start};
-    for (int i = 0;i < get_vertices_count();++i) {
-        unordered_set<int> new_superposition;
-        for (auto position : superposition) {
-            if (player[position] != k) {
-                new_superposition.emplace(strategy[position]);
-            } else {
-                for(auto move : g[position]) {
-                    new_superposition.emplace(move);
+vector<int> Game::neighbour_strategies_outcomes(const Strategy & strategy, int k) const {
+    const int n = get_vertices_count();
+    vector<int> superposition(n, 0);
+    vector<int> new_superposition(n, 0);
+    superposition[start] = 1;
+    for (int i = 0;i < n;++i) {
+        for (int j = 0;j < n;++j) {
+            if (superposition[j]) {
+                if (player[j] != k) {
+                    new_superposition[strategy[j]] = 1;
+                } else {
+                    for (auto move: g[j]) {
+                        new_superposition[move] = 1;
+                    }
+                    if (g[j].empty()) {
+                        new_superposition[j] = 1;
+                    }
                 }
-                if (g[position].empty()) {
-                    new_superposition.emplace(position);
-                }
+                superposition[j] = 0;
             }
         }
-        superposition = new_superposition;
+        swap(superposition, new_superposition);
     }
-    unordered_set<int> outcomes;
-    for (auto position : superposition) {
-        outcomes.emplace(component[position]);
+    vector<int> outcomes(get_components_count(), 0);
+    for (int i = 0; i < n; ++i) {
+        if (superposition[i] && (cnt_components_[component[i]] > 1 || is_leaf(i))) {
+            outcomes[component[i]] = 1;
+        }
     }
     return outcomes;
 }

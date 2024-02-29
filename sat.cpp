@@ -342,10 +342,13 @@ void SAT::add_strategy(const Strategy &strat, const Game &game) {
         //        continue;
         //    or_clause.push_back(get_var(other_outcome, outcome, k));
         //}
-        for (auto other_outcome : game.neighbour_strategies_outcomes(strat, k)) {
-            if (other_outcome == outcome)
+        auto outcomes = game.neighbour_strategies_outcomes(strat, k);
+        for (int i = 0; i < game.get_components_count();++i) {
+            if (outcomes[i]) {
+                if (i == outcome)
                     continue;
-            or_clause.push_back(get_var(other_outcome, outcome, k));
+                or_clause.push_back(get_var(i, outcome, k));
+            }
         }
     }
     cp_model.AddBoolOr(or_clause);
