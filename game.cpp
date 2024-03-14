@@ -323,3 +323,16 @@ void Game::set_graph_info() {
 bool Game::is_leaf(int v) const {
     return component_graph[component[v]].size() == 1 && component_graph[component[v]][0] == component[v];
 }
+
+void Game::print_graph() const {
+    for (size_t i = 0; i < g.size();++i) {
+        for (auto el : g[i]) {
+            cout << i + 1 << ' ' << el+ 1 << '\n';
+        }
+    }
+    for (auto el : player) {
+        cout << el + 1 << ' ';
+    }
+    cout << '\n';
+    print_terminal_descriptions();
+}

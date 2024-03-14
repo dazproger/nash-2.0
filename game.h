@@ -30,6 +30,7 @@ public:
     void set_graph_info();
     void reset_max_player();
     bool is_leaf(int) const;
+    void print_graph() const;
 private:
 	vector<vector<int>> g;
 	vector<int> player;
