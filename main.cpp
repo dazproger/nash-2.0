@@ -16,7 +16,7 @@ int solve(const Game& g) {
     start_sat.add_all_strategies(g);
     for (int i = 0; i < g.get_player_count(); ++i) {
         for (const auto& cycle : g.get_cycles()) {
-            SAT s = start_sat; // Pls God protect this line of code
+            SAT s = start_sat;  // Pls God protect this line of code
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
                 cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m" << endl;
@@ -46,11 +46,12 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         // g.reset_max_player();
         // return;
         if (solve(g)) {
-            //for (auto elem : pref) {
-            //    cout << elem + 1 << ' ';
-            //}
-            //cout << endl;
-            //cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
+            // for (auto elem : pref) {
+            //     cout << elem + 1 << ' ';
+            // }
+            // cout << endl;
+            // cout << "LOOK
+            // UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
         }
         g.reset_max_player();
         return;
@@ -98,17 +99,18 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     const int amount_of_terminals = 7;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
-    for (int i = 0; i < amount_of_games;++i) {
-        games.emplace_back(n - amount_of_terminals + popcount(static_cast<uint>(i)), start);
+    for (int i = 0; i < amount_of_games; ++i) {
+        games.emplace_back(n - amount_of_terminals + __builtin_popcount(static_cast<uint>(i)), start);
     }
-    // if (argc <= 1)
-    //     cout << "Input players corresponding to vertices: ";
+    if (argc <= 1)
+        cout << "Input players corresponding to vertices: ";
     if (argc <= 1)
         cout << "Input number of edges: ";
     int m;
     cin >> m;
     if (argc <= 1)
         cout << "Input edges (m lines):\n";
+    Game g(n, start);
     while (m--) {
 
         int a, b;
@@ -116,24 +118,26 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         --a;
         --b;
         if (b < n - amount_of_terminals) {
-            for (auto& el: games) {
+            for (auto& el : games) {
                 el.add_edge(a, b);
             }
-        }
-        else {
-            auto exp = n - b-1;
+        } else {
+            auto exp = n - b - 1;
             for (int i = 0; i < amount_of_games; ++i) {
-                if ((i>>exp) & 1) {
-                    games[i].add_edge(a, n - amount_of_terminals + popcount(static_cast<uint>(i >> exp))-1);
+                if ((i >> exp) & 1) {
+                    games[i].add_edge(a, n - amount_of_terminals + __builtin_popcount(static_cast<uint>(i >> exp)) - 1);
                 }
             }
         }
     }
+    // for (int i = 0; i< amount_of_games; ++i) {
+    //     check(games[i]);
+    // }
     auto st = time(nullptr);
-    for (int i = 0; i < amount_of_games/8; ++i) {
+    for (int i = 0; i < amount_of_games / 8; ++i) {
         vector<thread> threads;
         for (int j = 1; j <= 8; ++j) {
-            if (8*i + j < amount_of_games) {
+            if (8 * i + j < amount_of_games) {
                 threads.emplace_back(check, games[8 * i + j]);
             }
         }

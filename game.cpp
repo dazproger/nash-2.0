@@ -4,7 +4,7 @@
 
 Game::Game(int n, int start) : g(n), player(n), component(n), component_graph(n), start(start) {
 }
-Game::Game(const Game &other) {
+Game::Game(const Game& other) {
     g = other.g;
     player = other.player;
     component = other.component;
@@ -16,7 +16,7 @@ void Game::add_edge(int from, int to) {
 }
 
 void Game::set_player(int i, int player) {
-    this -> player[i] = player;
+    this->player[i] = player;
     player_cnt = max(player + 1, player_cnt);
 }
 
@@ -30,13 +30,14 @@ static void topsort(const vector<vector<int>>& graph, vector<int>& used, vector<
     sorted_vertexes.push_back(v);
 }
 
-static void find_one_component(const vector<vector<int>>& graph, vector<int>& component, vector<vector<int>>& component_graph, int v, int component_number) {
+static void find_one_component(const vector<vector<int>>& graph, vector<int>& component,
+                               vector<vector<int>>& component_graph, int v, int component_number) {
     component[v] = component_number;
     for (int u : graph[v]) {
         if (component[u] == -1) {
             find_one_component(graph, component, component_graph, u, component_number);
         } else {
-            component_graph[component[u]].push_back(component_number); 
+            component_graph[component[u]].push_back(component_number);
         }
     }
 }
@@ -47,7 +48,7 @@ static void make_unique(vector<int>& vec) {
 }
 
 void Game::fill_components() {
-    vector<vector<int>>& graph = g; // Rename g to graph in this function
+    vector<vector<int>>& graph = g;  // Rename g to graph in this function
     int n = get_vertices_count();
     vector<vector<int>> reversed_graph(n);
     for (int v = 0; v < n; ++v) {
@@ -82,7 +83,7 @@ void Game::fill_components() {
 }
 
 void Game::print_terminal_descriptions() const {
-    vector<vector<int>> components = get_components(); // Vertices grouped by components
+    vector<vector<int>> components = get_components();  // Vertices grouped by components
     std::cout << "Terminals description:\n";
     vector<int> my_terminals = get_terminal_components();
     for (size_t i = 0; i < my_terminals.size(); ++i) {
@@ -131,7 +132,7 @@ vector<int> Game::get_terminal_components() const {
     return terminals;
 }
 
-static void generate(const vector<vector<int>>& g, vector<Strategy> &s, vector<int>& strategy, int done_vertexes) {
+static void generate(const vector<vector<int>>& g, vector<Strategy>& s, vector<int>& strategy, int done_vertexes) {
     if (done_vertexes == g.size()) {
         s.emplace_back(strategy);
         return;
@@ -155,7 +156,7 @@ vector<Strategy> Game::generate_strategies() const {
 
 vector<Strategy> Game::neighbour_strategies(const Strategy& strategy, int k) const {
     vector<Strategy> ans;
-    for (int i = 0; i < get_vertices_count();++i) {
+    for (int i = 0; i < get_vertices_count(); ++i) {
         if (player[i] == k) {
             size_t n = ans.size();
             for (auto edge : g[i]) {
@@ -163,7 +164,7 @@ vector<Strategy> Game::neighbour_strategies(const Strategy& strategy, int k) con
                     ans.push_back(strategy.GetNewStrategy(i, edge));
                 }
             }
-            for (size_t j = 0;j < n;++j) {
+            for (size_t j = 0; j < n; ++j) {
                 for (auto edge : g[i]) {
                     if (edge != ans[j][i]) {
                         ans.push_back(ans[j].GetNewStrategy(i, edge));
@@ -174,35 +175,99 @@ vector<Strategy> Game::neighbour_strategies(const Strategy& strategy, int k) con
     }
     return ans;
 }
-vector<int> Game::neighbour_strategies_outcomes(const Strategy & strategy, int k) const {
-    const int n = get_vertices_count();
-    vector<int> superposition(n, 0);
-    vector<int> new_superposition(n, 0);
-    superposition[start] = 1;
-    for (int i = 0;i < n;++i) {
-        for (int j = 0;j < n;++j) {
-            if (superposition[j]) {
-                if (player[j] != k) {
-                    new_superposition[strategy[j]] = 1;
-                } else {
-                    for (auto move: g[j]) {
-                        new_superposition[move] = 1;
-                    }
-                    if (g[j].empty()) {
-                        new_superposition[j] = 1;
-                    }
-                }
-                superposition[j] = 0;
+vector<int> Game::neighbour_strategies_outcomes(const Strategy& strategy, int k) const {
+    int n = get_vertices_count();
+    vector<int> outcomes;
+    int cur_player = k;
+    // Graph creation
+    vector<vector<int>> left_graph(n);
+    vector<vector<int>> reversed_graph(n);
+    for (int v = 0; v < n; ++v) {
+        if (player[v] != cur_player) {
+            left_graph[v].push_back(strategy[v]);
+            reversed_graph[strategy[v]].push_back(v);
+            continue;
+        }
+        copy(g[v].begin(), g[v].end(), back_inserter(left_graph[v]));
+        for (int u : g[v]) {
+            reversed_graph[u].push_back(v);
+        }
+    }
+    ///////////////////
+    // Topologically sorting
+    vector<int> sorted_vertexes;
+    vector<int> used(n, 0);
+    topsort(left_graph, used, sorted_vertexes, start);
+    // Finding components
+    reverse(sorted_vertexes.begin(), sorted_vertexes.end());
+    vector<int> left_component(n, -1);
+    vector<vector<int>> left_component_graph(n, vector<int>());
+    int component_number = 0;
+    for (int i = 0; i < sorted_vertexes.size(); ++i) {
+        if (left_component[sorted_vertexes[i]] == -1) {
+            find_one_component(reversed_graph, left_component, left_component_graph, sorted_vertexes[i], component_number++);
+        }
+    }
+    left_component_graph.resize(component_number);
+    for (int i = 0; i < component_number; ++i) {
+        make_unique(left_component_graph[i]);
+        if (left_component_graph[i].empty()) {
+            left_component_graph[i].push_back(i);
+        }
+    }
+    /////////////////
+    // Filling left_cnt_components
+    vector<int> left_cnt_components(component_number);
+    for (int v = 0; v < n; ++v) {
+        if (!used[v]) continue;
+        ++left_cnt_components[left_component[v]];
+    }
+    /////////////////
+    // Adding outcomes
+    for (int v = 0; v < n; ++v) {
+        if (!used[v]) continue;
+        int c_left = left_component[v];
+        // cerr << v << ' ' << c_left << endl;
+        if (left_cnt_components[c_left] > 1) {
+            outcomes.push_back(component[v]);
+            continue;
+        }
+        for (int u : left_component_graph[c_left]) {
+            if (u == c_left) {
+                outcomes.push_back(component[v]);
+                break;
             }
         }
-        swap(superposition, new_superposition);
     }
-    vector<int> outcomes(get_components_count(), 0);
-    for (int i = 0; i < n; ++i) {
-        if (superposition[i] && (cnt_components_[component[i]] > 1 || is_leaf(i))) {
-            outcomes[component[i]] = 1;
-        }
-    }
+    make_unique(outcomes);
+    // cerr << "//////////////////////////////////" << endl;
+    // for (int i = 0; i < n; ++i) {
+    //     cerr << component[i] << ' ';
+    // }
+    // cerr << endl;
+    // for (int i = 0; i < n; ++i) {
+    //     cerr << left_component[i] << ' ';
+    // }
+    // cerr << endl;
+    // for (auto outcome : outcomes) {
+    //     cerr << outcome << ' ';
+    // }
+    // cerr << endl;
+    // for (int v = 0; v < n; ++v) {
+    //     cerr << v << ": ";
+    //     for (int u : left_graph[v]) {
+    //         cerr << u << ' ';
+    //     }
+    //     cerr << endl;
+    // }
+    // cerr << endl;
+    // for (int v = 0; v < component_number; ++v) {
+    //     cerr << v << ": ";
+    //     for (int u : left_component_graph[v]) {
+    //         cerr << u << ' ';
+    //     }
+    //     cerr << endl;
+    // }
     return outcomes;
 }
 
