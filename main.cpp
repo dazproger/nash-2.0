@@ -16,17 +16,19 @@ int solve(const Game& g) {
     start_sat.add_all_strategies(g);
     for (int i = 0; i < g.get_player_count(); ++i) {
         for (const auto& cycle : g.get_cycles()) {
-            SAT s = start_sat; // Pls God protect this line of code
+//            SAT s = start_sat; // Pls God protect this line of code
+            SAT s(g);
+            s.add_all_strategies(g);
             s.minimize_all_except(cycle, i);
             if (s.is_solvable()) {
                 cout << "\x1b[32;1mOH MY GOD YES WE HAVE FOUND IT!!!!!\x1b[0m" << endl;
+                g.print_graph();
                 s.print_beautiful_results();
                 exit(0);
             }
         }
     }
-    // cout << "\x1b[31;1m((\x1b[0m" << endl;
-    // print_all_achieve_ranks({2, 2, 0}, g);
+    print_all_achieve_ranks({2, 2, 0}, g);
     // g.print_terminal_descriptions();
     // s.minimize_loop_rank(2, 2);
     // s.minimize_all_except(6, 2);
@@ -46,11 +48,7 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
         // g.reset_max_player();
         // return;
         if (solve(g)) {
-            //for (auto elem : pref) {
-            //    cout << elem + 1 << ' ';
-            //}
-            //cout << endl;
-            //cout << "LOOK UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
+            cout << "solved \n";
         }
         g.reset_max_player();
         return;
@@ -81,7 +79,6 @@ void generate_players(Game& g) {
 
 void check(Game game) {
     game.set_graph_info();
-    game.print_terminal_descriptions();
     generate_players(game);
 }
 
@@ -95,7 +92,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    const int amount_of_terminals = 7;
+    const int amount_of_terminals = 8;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
     for (int i = 0; i < amount_of_games;++i) {
@@ -140,6 +137,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         for (auto& thread : threads) {
             thread.join();
         }
+        cout << i << endl;
     }
     cout << difftime(time(nullptr), st) << endl;
     return 0;
