@@ -9,57 +9,63 @@
 using namespace std;
 
 class Checker {
-  private:
-    int players_num;
-    int n;
-    int start;
-    int edges_count;
-    vector<vector<int>> g;
-    int terminal_count;
-    vector<int> cmp_v;
-    vector<vector<vector<int>>> priority;
-    vector<int> players_arr;
-    vector<vector<int>> players_v;
-    vector<vector<vector<pair<int, int>>>> changes;
-    int is_correct = 1;
-  public:
+private:
+    int vertices_count;            // Number of vertices in the given graph
+    int players_count;             // Number of players, currently only 3
+    int terminals_count;           // Number of terminal components
+    int starting_vertex;           // The vertexes from which the game starts
+    vector<vector<int>> graph;     // Given graph
+    vector<int> vertex_component;  // vertex_component[v] is number of component of vertex v
+    vector<vector<vector<bool>>>
+        player_preference;      // player_preference[p][x][y] = 1 if and only if p prefers terminal x over terminal y
+    vector<int> vertex_player;  // vertex_player[v] is number of player that controls this vertex
+    vector<vector<int>> vertices_by_players;                  // Vertices grouped by players
+    vector<vector<vector<pair<int, int>>>> possible_changes;  // Array of all possible ways how a strategy can change
+    bool is_correct = true;  // Controls whether has Nash equililbrium been found or not
+
+public:
+    // Function that initializes Checker from graphs/c22_contrexample
     void init() {
-        std::fstream in;
-        in.open ("/home/bogdan/nash-equilibrium/graphs/c22_contrexample", std::fstream::in);
-        players_num = 3;
-        in >> n;
-        in >> start;
-        --start;
+        std::ifstream in("graphs/c22_contrexample");
+        players_count = 3;
+        ////////////////////////// Graph input //////////////////////////
+        in >> vertices_count;
+        in >> starting_vertex;
+        --starting_vertex;
+        int edges_count;  // Number of edges in the graph
         in >> edges_count;
-        g.assign(n, {});
+        graph.assign(vertices_count, {});
         for (int i = 0; i < edges_count; ++i) {
-            int x, y;
-            in >> x >> y;
-            --x;
-            --y;
-            g[x].push_back(y);
+            int from, to;
+            in >> from >> to;
+            --from;
+            --to;
+            graph[from].push_back(to);
         }
-        for (int i = 0; i < n; ++i) {
-            if (g[i].empty()) {
-                g[i].push_back(i);
+        // If a vertex is a leaf we make it a loop
+        for (int i = 0; i < vertices_count; ++i) {
+            if (graph[i].empty()) {
+                graph[i].push_back(i);
             }
         }
-        in >> terminal_count;
-        cmp_v.assign(n, -1);
-        for (int i = 0; i < terminal_count; ++i) {
-            int cnt;
-            in >> cnt;
-            for (int j = 0; j < cnt; ++j) {
-                int x;
-                in >> x;
-                --x;
-                cmp_v[x] = i;
+        ///////////////////// Terminals info input //////////////////////
+        in >> terminals_count;
+        vertex_component.assign(vertices_count, -1);
+        for (int i = 0; i < terminals_count; ++i) {
+            int vertices_in_terminal_count;
+            in >> vertices_in_terminal_count;
+            for (int j = 0; j < vertices_in_terminal_count; ++j) {
+                int vertex;
+                in >> vertex;
+                --vertex;
+                vertex_component[vertex] = i;
             }
         }
-        priority.assign(players_num, vector<vector<int>>(terminal_count, vector<int>(terminal_count, 0)));
-        for (int p = 0; p < players_num; ++p) {
+        ///////////////// Setting up player preference //////////////////
+        player_preference.assign(players_count, vector<vector<bool>>(terminals_count, vector<bool>(terminals_count)));
+        for (int p = 0; p < players_count; ++p) {
             vector<int> pr;
-            for (int i = 0; i < terminal_count; ++i) {
+            for (int i = 0; i < terminals_count; ++i) {
                 int t;
                 in >> t;
                 --t;
@@ -67,99 +73,105 @@ class Checker {
             }
             for (int i = 0; i + 1 < pr.size(); ++i) {
                 for (int j = i + 1; j < pr.size(); ++j) {
-                    priority[p][pr[i]][pr[j]] = 1;
-                    priority[p][pr[j]][pr[i]] = -1;
+                    player_preference[p][pr[i]][pr[j]] = true;
+                    player_preference[p][pr[j]][pr[i]] = false;
                 }
             }
         }
-        players_arr.assign(n, 0);
-        players_v.assign(players_num, vector<int>());
-        for (int i = 0; i < n; ++i) {
-            in >> players_arr[i];
-            --players_arr[i];
-            players_v[players_arr[i]].push_back(i);
+        ///////////////////////// Players input /////////////////////////
+        vertex_player.assign(vertices_count, 0);
+        vertices_by_players.assign(players_count, vector<int>());
+        for (int i = 0; i < vertices_count; ++i) {
+            in >> vertex_player[i];
+            --vertex_player[i];
+            vertices_by_players[vertex_player[i]].push_back(i);
         }
-        changes.resize(players_num);
+        possible_changes.resize(players_count);
         in.close();
     }
 
-    int get_end_cmp(const vector<int>& strategy) {
-        int cur = 0;
+    // Plays strategy represeneted by the given vector from starting_vertex to the end
+    int find_strategy_outcome(const vector<int>& strategy) const {
+        int current = 0;
         for (int i = 0; i < strategy.size() + 10; ++i) {
-            cur = strategy[cur];
+            current = strategy[current];
         }
-        return cmp_v[cur];
+        return vertex_component[current];
     }
 
-    int can_make_better(int p, vector<int>& strategy, int cmp) {
-        for (auto& change : changes[p]) {
+    // Checks whether the player can get a better outcome for himself by changing the given strategy
+    bool is_improvable_by_player(int player, const vector<int>& strategy) const {
+        int outcome = find_strategy_outcome(strategy);
+        for (const auto& change : possible_changes[player]) {
             vector<int> new_strategy = strategy;
-            for (auto pr : change) {
-                new_strategy[pr.first] = pr.second;
+            for (const auto &[vertex, neighbour] : change) {
+                new_strategy[vertex] = neighbour;
             }
-            int new_cmp = get_end_cmp(new_strategy);
-            if (priority[p][cmp][new_cmp] == 1) {
-                return 1;
+            int new_outcome = find_strategy_outcome(new_strategy);
+            if (player_preference[player][outcome][new_outcome] == 1) {
+                return true;
             }
         }
-        return 0;
+        return false;
     }
 
-    void check_no_equilibrium(vector<int>& strategy, int cmp) {
-        int cnt = 0;
-        for (int p = 0; p < players_num; ++p) {
-            cnt += can_make_better(p, strategy, cmp);
+    // Checks that the strategy is not a nash equililbrium
+    void check_not_equilibrium(const vector<int>& strategy) {
+        for (int player = 0; player < players_count; ++player) {
+            if (is_improvable_by_player(player, strategy))
+                return;
         }
-        if (cnt == 0) {
-            is_correct = 0;
-            cout << endl;
-            for (auto x : strategy) {
-                cout << x + 1 << " ";
-            }
-            cout << endl;
+        is_correct = false;
+        cout << endl;
+        for (const auto& element : strategy) {
+            cout << element + 1 << " ";
         }
+        cout << endl;
     }
 
-    void generate(vector<int>& arr, int cur_num) {
-        if (cur_num == arr.size()) {
-            int cmp = get_end_cmp(arr);
-            check_no_equilibrium(arr, cmp);
+    // Recursively generates all strategies
+    void strategies_generate(vector<int>& strategy, int current_vertex) {
+        if (current_vertex == strategy.size()) {
+            check_not_equilibrium(strategy);
             return;
         }
-        for (auto u : g[cur_num]) {
-            arr[cur_num] = u;
-            generate(arr, cur_num + 1);
+        for (const auto& neighbour : graph[current_vertex]) {
+            strategy[current_vertex] = neighbour;
+            strategies_generate(strategy, current_vertex + 1);
         }
     }
 
-    void generate_change(int p, vector<pair<int, int>>& cur, int cur_num) {
-        if (cur_num == players_v[p].size()) {
-            changes[p].push_back(cur);
+    // Recursively generates all changes that the player can apply to a strategy and puts them in possible_changes vector
+    void generate_change(int player, vector<pair<int, int>>& change_prefix) {
+        int current_vertex_number = change_prefix.size();
+        if (current_vertex_number == vertices_by_players[player].size()) {
+            possible_changes[player].push_back(change_prefix);
             return;
         }
-        for (auto u : g[players_v[p][cur_num]]) {
-            cur.emplace_back(players_v[p][cur_num], u);
-            generate_change(p, cur, cur_num + 1);
-            cur.pop_back();
+        for (const auto& neighbour : graph[vertices_by_players[player][current_vertex_number]]) {
+            change_prefix.emplace_back(vertices_by_players[player][current_vertex_number], neighbour);
+            generate_change(player, change_prefix);
+            change_prefix.pop_back();
         }
     }
 
+    // Fills possible_changes vector
     void make_changes() {
-        for (int p = 0; p < players_num; ++p) {
-            vector<pair<int, int>> cur;
-            generate_change(p, cur, 0);
+        for (int player = 0; player < players_count; ++player) {
+            vector<pair<int, int>> empty_prefix;
+            generate_change(player, empty_prefix);
         }
     }
 
-    int check() {
+    // Checks that the example given in graphs/c22_contrexample does not have a Nash equililbrium
+    bool check() {
         init();
         make_changes();
-        vector<int> arr(n, 0);
-        generate(arr, 0);
+        vector<int> empty_strategy(vertices_count);
+        strategies_generate(empty_strategy, 0);
         return is_correct;
     }
 };
-
 
 int main() {
     Checker checker;
