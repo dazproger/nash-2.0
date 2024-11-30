@@ -12,6 +12,11 @@ int solve(const Game& g) {
         // cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
         return 0;
     }
+    else{
+        initial_sat.print_beautiful_results();
+        cout << "hell yeah\n";
+        return 1;
+    }
     SAT start_sat(g);
     start_sat.add_all_strategies(g);
     for (int i = 0; i < g.get_player_count(); ++i) {
@@ -74,8 +79,34 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
     }
 }
 
+void set_play_once_players(Game& g) {
+    int n = g.get_vertices_count();
+    vector<int> not_leaves;
+    g.set_player(0, 0);
+    for(int i = 1; i < n; ++i) {
+        if (g.is_leaf(i)) {
+            g.set_player(i, 0);
+        }
+        else {
+            not_leaves.push_back(i);
+        }
+
+    }
+    do {
+        for(int i = 0; i < not_leaves.size(); ++i) {
+            g.set_player(not_leaves[i], i);
+            cout << not_leaves[i];
+        }
+        cout << '\n';
+        if (solve(g)){
+            cout << "hellyeah x2\n";
+        }
+    } while (next_permutation(not_leaves.begin(), not_leaves.end()));
+}
 // Recursive search of players; in g only the graph should be specified
 void generate_players(Game& g) {
+    set_play_once_players(g);
+    return;
     vector<int> pref;
     vector<int> used(g.get_vertices_count());
     rec(pref, used, 0, 0, g);
@@ -96,7 +127,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    const int amount_of_terminals = 6;
+    const int amount_of_terminals = 3;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
     for (int i = 0; i < amount_of_games; ++i) {
@@ -130,9 +161,10 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
             }
         }
     }
-    // for (int i = 0; i< amount_of_games; ++i) {
-    //     check(games[i]);
-    // }
+    for (int i = 1; i < amount_of_games; ++i) {
+         check(games[i]);
+    }
+    return 0;
     auto st = time(nullptr);
     for (int i = 0; i < amount_of_games / 8; ++i) {
         vector<thread> threads;
@@ -149,3 +181,6 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     cout << difftime(time(nullptr), st) << endl;
     return 0;
 }
+// mkdit build
+// cmake --build ./build/ --target nash-2.0
+// ./build/nash-2.0
