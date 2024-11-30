@@ -120,7 +120,10 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         cout << "Input starting vertex: ";
     cin >> start;
     --start;
-    const int amount_of_terminals = 3;
+    if (argc <= 1)
+        cout << "Input amount of terminals: ";
+    int amount_of_terminals = 3;
+    cin >> amount_of_terminals;
     int amount_of_games = 1 << amount_of_terminals;
     vector<Game> games;
     for (int i = 0; i < amount_of_games; ++i) {
