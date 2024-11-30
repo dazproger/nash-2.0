@@ -81,27 +81,20 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
 
 void set_play_once_players(Game& g) {
     int n = g.get_vertices_count();
-    vector<int> not_leaves;
+    int cnt = 1;
     g.set_player(0, 0);
     for(int i = 1; i < n; ++i) {
         if (g.is_leaf(i)) {
             g.set_player(i, 0);
         }
         else {
-            not_leaves.push_back(i);
+            g.set_player(i, cnt);
+            ++cnt;
         }
-
     }
-    do {
-        for(int i = 0; i < not_leaves.size(); ++i) {
-            g.set_player(not_leaves[i], i);
-            cout << not_leaves[i];
-        }
-        cout << '\n';
-        if (solve(g)){
-            cout << "hellyeah x2\n";
-        }
-    } while (next_permutation(not_leaves.begin(), not_leaves.end()));
+    if (solve(g)) {
+        cout << "hellyeah x2\n";
+    }
 }
 // Recursive search of players; in g only the graph should be specified
 void generate_players(Game& g) {
