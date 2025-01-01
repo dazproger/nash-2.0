@@ -1,1 +1,13 @@
 build
+a.out
+cmake-build-*/
+.idea
+.cmake
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
+nash_equilibrium.cbp
+nash_equilibrium
+sat-test
+Makefile
+Testing/
