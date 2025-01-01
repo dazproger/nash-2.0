@@ -1,5 +1,8 @@
 #include "sat.h"
 // #include <format>
+using std::cout;
+using std::cerr;
+using std::endl;
 
 SAT::SAT(const Game &game) {
     variables.resize(game.get_components_count());
@@ -219,7 +222,7 @@ static vector<int> get_ranks(const CpSolverResponse &response, const VariableTab
             }
         }
     }
-    std::sort(result.begin(), result.end(), greater<>());
+    std::sort(result.begin(), result.end(), std::greater<>());
     return result;
 }
 
@@ -257,7 +260,7 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
         }
         cout << '\n';
     }
-    std::sort(result.begin(), result.end(), greater<>());
+    std::sort(result.begin(), result.end(), std::greater<>());
     cout << "Result:\n";
     for (auto el : result) {
         cout << el << " ";

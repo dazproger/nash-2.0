@@ -2,7 +2,9 @@
 #pragma once
 #include <unordered_set>
 #include <vector>
-using namespace std;
+
+using std::vector;
+
 struct Strategy {
 public:
     Strategy(const vector<int>& strategy) {

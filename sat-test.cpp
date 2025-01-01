@@ -1,7 +1,7 @@
 #include <ortools/sat/cp_model.h>
 
 using namespace operations_research::sat;
-using namespace std;
+using std::cout;
 
 int main() {
     CpModelBuilder cp_model;
@@ -18,7 +18,7 @@ int main() {
         cout << "Solution " << num_solutions;
         cout << "  a = " << SolutionBooleanValue(r, a);
         cout << "  b = " << SolutionBooleanValue(r, b);
-        cout << "  c = " << SolutionBooleanValue(r, c) << endl;
+        cout << "  c = " << SolutionBooleanValue(r, c) << std::endl;
     num_solutions++;
     }));
     // Solving part.

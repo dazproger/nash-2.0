@@ -5,7 +5,7 @@
 
 #include "strategy.h"
 
-using namespace std;
+using std::vector;
 
 class Game {
 public:

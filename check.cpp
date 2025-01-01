@@ -6,7 +6,8 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
+using std::cout;
+using std::vector;
 
 class Checker {
 private:
@@ -20,7 +21,7 @@ private:
         player_preference;      // player_preference[p][x][y] = 1 if and only if p prefers terminal x over terminal y
     vector<int> vertex_player;  // vertex_player[v] is number of player that controls this vertex
     vector<vector<int>> vertices_by_players;                  // Vertices grouped by players
-    vector<vector<vector<pair<int, int>>>> possible_changes;  // Array of all possible ways how a strategy can change
+    vector<vector<vector<std::pair<int, int>>>> possible_changes;  // Array of all possible ways how a strategy can change
     bool is_correct = true;  // Controls whether has Nash equililbrium been found or not
 
 public:
@@ -122,11 +123,11 @@ public:
                 return;
         }
         is_correct = false;
-        cout << endl;
+        cout << std::endl;
         for (const auto& element : strategy) {
             cout << element + 1 << " ";
         }
-        cout << endl;
+        cout << std::endl;
     }
 
     // Recursively generates all strategies
@@ -142,7 +143,7 @@ public:
     }
 
     // Recursively generates all changes that the player can apply to a strategy and puts them in possible_changes vector
-    void generate_change(int player, vector<pair<int, int>>& change_prefix) {
+    void generate_change(int player, vector<std::pair<int, int>>& change_prefix) {
         int current_vertex_number = change_prefix.size();
         if (current_vertex_number == vertices_by_players[player].size()) {
             possible_changes[player].push_back(change_prefix);
@@ -158,7 +159,7 @@ public:
     // Fills possible_changes vector
     void make_changes() {
         for (int player = 0; player < players_count; ++player) {
-            vector<pair<int, int>> empty_prefix;
+            vector<std::pair<int, int>> empty_prefix;
             generate_change(player, empty_prefix);
         }
     }

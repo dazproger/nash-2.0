@@ -4,7 +4,11 @@
 #include "sat.h"
 #include <thread>
 
-using namespace std;
+using std::cout;
+using std::cin;
+using std::endl;
+
+
 int solve(const Game& g) {
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
@@ -79,38 +83,11 @@ void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game&
     }
 }
 
-void set_play_once_players(Game& g) {
-    int n = g.get_vertices_count();
-    int cnt = 1;
-    g.set_player(0, 0);
-    for(int i = 1; i < n; ++i) {
-        if (g.is_leaf(i)) {
-            g.set_player(i, 0);
-        }
-        else {
-            g.set_player(i, cnt);
-            ++cnt;
-        }
-    }
-    if (solve(g)) {
-        cout << "hellyeah x2\n";
-    }
-}
-// Recursive search of players; in g only the graph should be specified
-void generate_players(Game& g) {
-    set_play_once_players(g);
+void check(Game g) {
     return;
-    vector<int> pref;
-    vector<int> used(g.get_vertices_count());
-    rec(pref, used, 0, 0, g);
 }
 
-void check(Game game) {
-    game.set_graph_info();
-    generate_players(game);
-}
-
-int main(int argc, __attribute__((unused)) char* argv[]) {
+int mian(int argc, __attribute__((unused)) char* argv[]) {
     int n;
     if (argc <= 1)
         cout << "Input number of vertices: ";
@@ -163,7 +140,7 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     return 0;
     auto st = time(nullptr);
     for (int i = 0; i < amount_of_games / 8; ++i) {
-        vector<thread> threads;
+        vector<std::thread> threads;
         for (int j = 1; j <= 8; ++j) {
             if (8 * i + j < amount_of_games) {
                 threads.emplace_back(check, games[8 * i + j]);
@@ -177,6 +154,31 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
     cout << difftime(time(nullptr), st) << endl;
     return 0;
 }
+
+
+#include "nauty.h" // Основной заголовочный файл Nauty
+#define MAXN 10
+#define MAXM 10
+int main() {
+    // Конфигурация графа
+    // Define the size of the graph
+    int n = 4; // Number of vertices
+    graph g[MAXN * MAXM]; // Graph representation
+    set *gv; // Graph vertex sets
+
+    // Initialize the graph
+    EMPTYGRAPH(g, 1, n);
+    ADDONEEDGE(g, 0, 1, 1);
+    ADDONEEDGE(g, 1, 2, 1);
+    ADDONEEDGE(g, 2, 3, 1);
+    ADDONEEDGE(g, 3, 0, 1);
+
+    // Display the graph
+    std::cout << "Graph created with 4 vertices and 4 edges.\n";
+
+    return 0;
+}
+
 // mkdit build
 // cmake --build ./build/ --target nash-2.0
 // ./build/nash-2.0

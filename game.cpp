@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <iostream>
 
+using std::cout;
+
+
 Game::Game(int n, int start) : g(n), player(n), component(n), component_graph(n), start(start) {
 }
 Game::Game(const Game& other) {
@@ -17,7 +20,7 @@ void Game::add_edge(int from, int to) {
 
 void Game::set_player(int i, int player) {
     this->player[i] = player;
-    player_cnt = max(player + 1, player_cnt);
+    player_cnt = std::max(player + 1, player_cnt);
 }
 
 static void topsort(const vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) {
