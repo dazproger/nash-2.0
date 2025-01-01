@@ -3,6 +3,10 @@
 
 using std::cout;
 
+void set_play_once_players(Game& g);
+void stupid_check_skeleton(Game& g);
+void smart_check_skeleton(Game& g);
+
 void set_play_once_players(Game& g) {
     int n = g.get_vertices_count();
     int cnt = 1;

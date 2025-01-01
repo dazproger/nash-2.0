@@ -1,10 +1,12 @@
-cmake_minimum_required(VERSION 3.22.1)
-project(nash-2.0)
-
-find_package(ortools CONFIG REQUIRED)
+cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
+project(nash-2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS -Wall)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -O0 -g3 -fsanitize=undefined,address")
+set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Werror -Wextra -std=gnu++20 -g0 -O2")
+
+find_package(ortools CONFIG REQUIRED)
 
 # Указываем, что заголовки и библиотека находятся в стандартных путях
 find_library(NAUTY_LIB nauty.a REQUIRED)
@@ -23,12 +25,7 @@ add_executable(sat-test sat-test.cpp)
 target_link_libraries(sat-test ortools::ortools)
 
 add_executable(nash-2.0 main.cpp game.cpp sat.cpp checker.cpp graph-iter.cpp)
-add_executable(nash-2.0_asan main.cpp game.cpp checker.cpp graph-iter.cpp)
 
 # Линкуем библиотеки
 target_link_libraries(nash-2.0 ortools::ortools ${NAUTY_LIB})
-target_link_libraries(nash-2.0_asan ortools::ortools ${NAUTY_LIB})
 
-# Настройки для AddressSanitizer
-set_target_properties(nash-2.0_asan PROPERTIES COMPILE_FLAGS "-g -fsanitize=address,undefined")
-set_target_properties(nash-2.0_asan PROPERTIES LD_FLAGS "-fsanitize=address,undefined")
