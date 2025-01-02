@@ -4,7 +4,7 @@ project(nash-2.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -O0 -g3 -fsanitize=undefined,address")
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Werror -Wextra -std=gnu++20 -g0 -O2")
+set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -std=gnu++20 -g0 -O2")
 
 find_package(ortools CONFIG REQUIRED)
 
@@ -24,7 +24,9 @@ include_directories(${NAUTY_INCLUDE_DIR})
 add_executable(sat-test sat-test.cpp)
 target_link_libraries(sat-test ortools::ortools)
 
-add_executable(nash-2.0 main.cpp game.cpp sat.cpp checker.cpp graph-iter.cpp)
+set(SOURCES game.cpp sat.cpp checker.cpp graph-iter.cpp)
+
+add_executable(nash-2.0 main.cpp ${SOURCES})
 
 # Линкуем библиотеки
 target_link_libraries(nash-2.0 ortools::ortools ${NAUTY_LIB})

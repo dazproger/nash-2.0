@@ -7,17 +7,18 @@
 
 using std::vector;
 
-class Game {
+class Game 
+{
 public:
-	Game(int, int);
+    Game(int, int);
     Game(const Game&);
-	void add_edge(int, int);
-	void set_player(int, int);
+    void add_edge(int, int);
+    void set_player(int, int);
     vector<Strategy> generate_strategies() const;
     vector<int> get_terminal_components() const;
     vector<Strategy> neighbour_strategies(const Strategy&, int) const;
     vector<int> neighbour_strategies_outcomes(const Strategy&, int) const;
-	void fill_components();
+    void fill_components();
     void print_components() const;
     void print_terminal_descriptions() const;
     int play_strat(const Strategy&) const;
@@ -32,11 +33,11 @@ public:
     bool is_leaf(int) const;
     void print_graph() const;
 private:
-	vector<vector<int>> g;
-	vector<int> player;
-	vector<int> component;
-	vector<vector<int>> component_graph;
-	int start;
+    vector<vector<int>> g;
+    vector<int> player;
+    vector<int> component;
+    vector<vector<int>> component_graph;
+    int start;
     int player_cnt = 0;
     vector<int> cnt_components_;
     vector<int> cycles;

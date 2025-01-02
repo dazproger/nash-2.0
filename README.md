@@ -13,7 +13,7 @@ This is a repository for a research project on Game theory, specifically concent
 
 * Ortools library ([install](https://developers.google.com/optimization/install?hl=ru) or use ``python -m pip install ortools --break-system-paskages``)
 
-> Make sure both Nautilus and Ortools are located at default system paths (for example, /usr/local/ on Linux). You can manually move all packages with commands like ``sudo cp -rf /path/to/ortools/<xxx>/* /usr/local/<xxx>`` or specify path to a directory in CMakeLists.txt by adding ``set(CMAKE_PREFIX_PATH /path/to/libraries/)`` right before ``find_paskage(...)`` line.
+> Make sure both Nautilus and Ortools are located at default system paths (for example, /usr/local/ on Linux). You can manually move all packages with commands like ``sudo cp -rf /path/to/ortools/<xxx>/* /usr/local/<xxx>`` or specify path to a directory in CMakeLists.txt by adding ``set(CMAKE_PREFIX_PATH /path/to/libraries/)`` right before ``find_package(...)`` line.
 
 
 ## Building
@@ -28,7 +28,7 @@ rm -rf build/
 cmake -B build/ -S . -DCMAKE_BUILD_TYPE=DEBUG
 ```
 
-* Configuring **RELEASE** version (do not include debug info; optimized and syntax-strict)
+* Configuring **RELEASE** version (do not include debug info; optimized)
 ```
 cmake -B build/ -S . -DCMAKE_BUILD_TYPE=RELEASE
 ```
