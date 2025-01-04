@@ -10,6 +10,7 @@ This is a repository for a research project on Game theory, specifically concent
 * CMake version >= 3.26
 
 * Nautilus library ([link](https://users.cecs.anu.edu.au/~bdm/nauty/) or [link](https://pallini.di.uniroma1.it/))
+\\ also geng, directg, showg utilities (maybe more)
 
 * Ortools library ([install](https://developers.google.com/optimization/install?hl=ru) or use ``python -m pip install ortools --break-system-paskages``)
 

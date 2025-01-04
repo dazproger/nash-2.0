@@ -2,6 +2,7 @@
 #include <ctime>
 #include "game.h"
 #include "sat.h"
+#include "graph-iter.h"
 #include <thread>
 
 using std::cout;
@@ -156,27 +157,12 @@ int mian(int argc, __attribute__((unused)) char* argv[]) {
 }
 
 
-#include "nauty.h" // Основной заголовочный файл Nauty
 #define MAXN 10
 #define MAXM 10
+#include "nauty.h" // Основной заголовочный файл Nauty
 int main() {
-    // Конфигурация графа
-    // Define the size of the graph
-    int n = 4; // Number of vertices
-    graph g[MAXN * MAXM]; // Graph representation
-    set *gv; // Graph vertex sets
-
-    // Initialize the graph
-    EMPTYGRAPH(g, 1, n);
-    ADDONEEDGE(g, 0, 1, 1);
-    ADDONEEDGE(g, 1, 2, 1);
-    ADDONEEDGE(g, 2, 3, 1);
-    ADDONEEDGE(g, 3, 0, 1);
-
-    // Display the graph
-    std::cout << "Graph created with 4 vertices and 4 edges.\n";
-
-    return 0;
+    generate_geng(4);
+    generate_directg();
 }
 
 // mkdit build

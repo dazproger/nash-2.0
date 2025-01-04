@@ -4,13 +4,15 @@
 // потом к каждой вершине привязать терминал
 // надо создавть инстанс класса graph, чтобы потом скармливать это в перебор
 
-// как это сделать?
-// рекурсивный перебор стрелочек из каждой вершины
-// стрелочка "назад" может идти только если есть оттуда путь по стрелкам "вперед" в конкретную вершину
+void generate_geng(int); 
 
-void graph_brute_force(int n);
+void generate_directg();
 
+// there should be a starting vertex
+// every vertex is reachable from it and it has no incoming edges
+void filter_directg(); // use readg from gtools.h or something else
 
-// разобаться как подключать nauty
+// add starting vertex all possible ways
+void add_start_directg(); // use readg from gtools.h or something else
 
-// geng than directg -> profit
+void graph_brute_force(int );
