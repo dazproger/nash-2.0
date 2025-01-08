@@ -157,12 +157,115 @@ int mian(int argc, __attribute__((unused)) char* argv[]) {
 }
 
 
+bool test_new_func(Game& game) {
+    auto all_strategies = game.generate_strategies();
+    int k = game.get_player_count();
+    for (const auto& strategy : all_strategies) {
+        for (int i = 0; i < k; ++i) {
+            auto fast_outcomes = game.neighbour_strategies_outcomes(strategy, k);
+            vector<int> right_outcomes;
+            int outcome = game.play_strat(strategy);
+            for (const auto &neighbour_strat : game.neighbour_strategies(strategy, k)) {
+                int other_outcome = game.play_strat(neighbour_strat);
+                if (other_outcome != outcome) {
+                    right_outcomes.push_back(other_outcome);
+                }
+            }
+            std::sort(fast_outcomes.begin(), fast_outcomes.end());
+            std::sort(right_outcomes.begin(), right_outcomes.end());
+            if (right_outcomes != fast_outcomes) {
+                strategy.print();
+                cout << "player " << i << "\n";
+                cout << "fast_outcomes:  ";
+                for (auto el : fast_outcomes) {
+                    cout << el << " ";
+                }
+                cout << '\n';
+                cout << "right_outcomes: ";
+                for (auto el : right_outcomes) {
+                    cout << el << " ";
+                }
+                cout << '\n';
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void gen_players2(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game& g) {
+    if (pref.size() == g.get_vertices_count()) {
+        if (cnt_used <= 2)
+            return;
+        for (int v = 0; v < g.get_vertices_count(); ++v) {
+            g.set_player(v, pref[v]);
+        }
+        // print_all_achieve_ranks({2, 2, 0}, g);
+        // g.reset_max_player();
+        // return;
+        if (!test_new_func(g)) {
+            // for (auto elem : pref) {
+            //     cout << elem + 1 << ' ';
+            // }
+            // cout << endl;
+            // cout << "LOOK
+            // UP\n//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n";
+            g.print_graph();
+            g.print_components();
+            exit(0);
+        }
+        g.reset_max_player();
+        return;
+    }
+    if (g.is_leaf(pref.size())) {
+        pref.push_back(0);
+        gen_players2(pref, used, cnt_used, num_last + (0 == num_last), g);
+        pref.pop_back();
+        return;
+    }
+    for (int player = 0; player <= num_last; ++player) {
+        pref.push_back(player);
+        cnt_used += used[player] == 0;
+        used[player]++;
+        gen_players2(pref, used, cnt_used, num_last + (player == num_last) - (num_last == 3), g);
+        used[player]--;
+        cnt_used -= used[player] == 0;
+        pref.pop_back();
+    }
+}
+
 #define MAXN 10
 #define MAXM 10
 #include "nauty.h" // Основной заголовочный файл Nauty
-int main() {
-    generate_geng(4);
-    generate_directg();
+
+int main(int argc, __attribute__((unused)) char* argv[]) {
+    int n;
+    if (argc <= 1)
+        cout << "Input number of vertices: ";
+    cin >> n;
+    int start;
+    if (argc <= 1)
+        cout << "Input starting vertex: ";
+    cin >> start;
+    --start;
+    if (argc <= 1)
+        cout << "Input number of edges: ";
+    int m;
+    cin >> m;
+    if (argc <= 1)
+        cout << "Input edges (m lines):\n";
+    Game g(n, start);
+    while (m--) {
+        int a, b;
+        cin >> a >> b;
+        --a;
+        --b;
+        g.add_edge(a, b);
+    }
+    vector<int> pref;
+    vector<int> used(n, 0);
+    g.set_graph_info();
+    gen_players2(pref, used, 0, 0, g);
 }
 
 // mkdit build

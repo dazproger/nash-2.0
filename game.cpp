@@ -309,7 +309,14 @@ vector<int> Game::neighbour_strategies_outcomes(const Strategy& strategy, int k)
     //     }
     //     cerr << endl;
     // }
-    return outcomes;
+    vector<int> ans;
+    int initial_outcome = play_strat(strategy);
+    for (auto el : outcomes) {
+        if (el != initial_outcome) {
+            ans.push_back(el);
+        }
+    }
+    return ans;
 }
 
 int Game::get_vertices_count() const {

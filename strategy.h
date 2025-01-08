@@ -2,6 +2,7 @@
 #pragma once
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
 using std::vector;
 
@@ -30,6 +31,13 @@ public:
         auto data = data_;
         data[index] = new_edge;
         return data;
+    }
+    void print() const {
+        std::cout << "Strategy: ";
+        for (auto el : data_) {
+            std::cout << el << " ";
+        }
+        std::cout << "\n";
     }
 private:
     vector<int> data_;
