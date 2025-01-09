@@ -15,4 +15,4 @@ void filter_directg(); // use readg from gtools.h or something else
 // add starting vertex all possible ways
 void add_start_directg(); // use readg from gtools.h or something else
 
-void graph_brute_force(int );
+void graph_bruteforce(int);

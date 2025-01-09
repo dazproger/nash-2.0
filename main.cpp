@@ -234,11 +234,7 @@ void gen_players2(vector<int>& pref, vector<int>& used, int cnt_used, int num_la
     }
 }
 
-#define MAXN 10
-#define MAXM 10
-#include "nauty.h" // Основной заголовочный файл Nauty
-
-int main(int argc, __attribute__((unused)) char* argv[]) {
+Game read_graph(int argc) {
     int n;
     if (argc <= 1)
         cout << "Input number of vertices: ";
@@ -262,10 +258,18 @@ int main(int argc, __attribute__((unused)) char* argv[]) {
         --b;
         g.add_edge(a, b);
     }
-    vector<int> pref;
-    vector<int> used(n, 0);
-    g.set_graph_info();
-    gen_players2(pref, used, 0, 0, g);
+    //g.set_graph_info()
+    return g;
+}
+#define MAXN 10
+#define MAXM 10
+#include "nauty.h" // Основной заголовочный файл Nauty
+
+int main(int argc, __attribute__((unused)) char* argv[]) {
+    cout << "dont enter numbers higher than 6\nFOR REAL!!!!\n";
+    int n;
+    cin >> n;
+    graph_bruteforce(n);
 }
 
 // mkdit build
