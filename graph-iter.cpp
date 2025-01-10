@@ -75,7 +75,7 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<int>& has_incoming_
     }
     
     // check for starting vertex, if found -> return it
-    // can skip checking for starting vertex
+    // can skip checking for cycles if we are checking for starting vertex
     vector<int> candidates;
     for (int i = 0; i < has_incoming_edges.size();++i) {
         if (!has_incoming_edges[i]) {

@@ -30,8 +30,10 @@ void stupid_check_skeleton(Game& g) {
     if (!initial_sat.is_solvable()) {
         // cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
     } else {
+        g.print_graph();
         initial_sat.print_beautiful_results();
         cout << "hell yeah\n";
+        exit(0);
     }
 }
 
