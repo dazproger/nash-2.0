@@ -33,12 +33,12 @@ public:
     bool is_leaf(int) const;
     void print_graph() const;
 private:
-    vector<vector<int>> g;
-    vector<int> player;
-    vector<int> component;
-    vector<vector<int>> component_graph;
+    vector<vector<int>> g; // graph vector of neighbours
+    vector<int> player; // players corresponding to each vertex, first players corresponds to terminals(leaves)
+    vector<int> component; // number of a component of double connectivity, in which lies vertex
+    vector<vector<int>> component_graph; // graph of commponents
     int start;
     int player_cnt = 0;
-    vector<int> cnt_components_;
-    vector<int> cycles;
+    vector<int> cnt_components_; // amount of vertexes in each component
+    vector<int> cycles; // list of components which are cycles <=> have more than one vertex <=> nonterminal outcomes
 };
