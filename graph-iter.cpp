@@ -97,8 +97,6 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<int>& has_incoming_
         }
     }
     return candidates[0];
-
-
 }
 
 void filter_directg(){
@@ -131,9 +129,13 @@ void filter_directg(){
                 }
             }
         }
-        if (graph_check(graph, has_incoming_edges) != -1) {
+
+        if ((int start = graph_check(graph, has_incoming_edges)) != -1) {
+            // TODO: 
             ++num_graphs;
         }
+
+
     }
     std::cout << "found " << num_graphs << " with cycles   (not necessarily with starting vertex)  it depends on 74 line\n";
     fclose(file);

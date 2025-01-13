@@ -37,7 +37,6 @@ void stupid_check_skeleton(Game& g) {
     }
 }
 
-
 // works only for one whole infinite outcome
 void smart_check_skeleton(Game& g) {
     set_play_once_players(g);
