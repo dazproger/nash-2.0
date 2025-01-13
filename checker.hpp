@@ -10,6 +10,8 @@ using std::vector;
 void stupid_check_skeleton(Game& g);
 void smart_check_skeleton(Game& g, int closeness_to_playonce = 0);
 
+void one_infinite_check_skeleton(Game& g, int closeness_to_playonce = 0);
+
 class Checker 
 {
 public:

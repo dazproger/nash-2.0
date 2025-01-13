@@ -23,6 +23,47 @@ void set_play_once_players(Game& g) {
     }
 }
 
+bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int num_used_players, int closeness_to_playonce) {
+    bool ans = false;
+    if (prefix.size() == g.get_vertices_count()) {
+        for (int v = 0; v < g.get_vertices_count(); ++v) {
+            g.set_player(v, prefix[v]);
+        }
+        SAT initial_sat(g);
+        initial_sat.add_all_strategies(g);
+        if (!initial_sat.is_solvable()) {
+            g.reset_max_player();
+            return false;
+        } else {
+            g.print_graph();
+            initial_sat.print_beautiful_results();
+            cout << "hell yeah\n";
+            return true;
+        }
+    }
+    if (g.is_leaf(prefix.size())) {
+        prefix.push_back(0);
+        ans |= recursive_gen_players(g, prefix, non_terminals, num_used_players, closeness_to_playonce);
+        prefix.pop_back();
+        return ans;
+    }
+    if (non_terminals - num_used_players == closeness_to_playonce) {
+        prefix.push_back(num_used_players);
+        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players+1, closeness_to_playonce);
+        prefix.pop_back();
+        return ans;
+    }
+    for (int player = 0; player <= num_used_players; ++player) {
+        prefix.push_back(player);
+        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players + player==num_used_players, closeness_to_playonce);
+        prefix.pop_back();
+        if (ans) {
+            return ans;
+        }
+    }
+
+}
+
 void stupid_check_skeleton(Game& g) {
     set_play_once_players(g);
     SAT initial_sat(g);
@@ -37,9 +78,21 @@ void stupid_check_skeleton(Game& g) {
     }
 }
 
+
+void smart_check_skeleton(Game& g, int closeness_to_playonce = 0) {
+    if (!closeness_to_playonce) { // i think this is useless
+        stupid_check_skeleton(g);
+    } else {
+        vector<int> prefix;
+        bool ans = recursive_gen_players(g, prefix, 0, 0, closeness_to_playonce);
+        //??? return ans;
+    }
+
+
+}
+
 // works only for one whole infinite outcome
-void smart_check_skeleton(Game& g) {
-    set_play_once_players(g);
+void one_infinite_check_skeleton(Game& g, int closeness_to_playonce) {
     // go threw some предпочтения check is there Nash equilibruim
 }
 
