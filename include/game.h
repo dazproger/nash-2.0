@@ -15,7 +15,7 @@ public:
     Game(const std::vector<std::vector<int>>& graph_matrix, int start);
 
     void add_edge(int from, int to);
-    void set_player(int i, int player);
+    void set_player(int i, int player_to_set);
     vector<Strategy> generate_strategies() const;
     vector<int> get_terminal_components() const;
     vector<Strategy> neighbour_strategies(const Strategy&, int) const;
@@ -27,6 +27,7 @@ public:
     int get_player_count() const;
     int get_vertices_count() const;
     int get_components_count() const;
+    int get_starting_vertex() const;
     vector<vector<int>> get_components() const;
     vector<int> get_cnt_components() const;
     vector<int> get_cycles() const;

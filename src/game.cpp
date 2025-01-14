@@ -10,7 +10,7 @@ Game::Game(int n, int start)
 {}
 
 Game::Game(const std::vector<std::vector<int>>& matrix, int start) 
-: g(matrix.size()), player(matrix.size()), component(matrix.size()), component_graph(matrix.size()), start(start) 
+: g(matrix), player(matrix.size()), component(matrix.size()), component_graph(matrix.size()), start(start) 
 {}
 
 Game::Game(const Game& other)
@@ -27,10 +27,10 @@ void Game::add_edge(int from, int to)
     g[from].push_back(to);
 }
 
-void Game::set_player(int i, int player) 
+void Game::set_player(int i, int player_to_set) 
 {
-    this->player[i] = player;
-    player_cnt = std::max(player + 1, player_cnt);
+    player[i] = player_to_set;
+    player_cnt = std::max(player_to_set + 1, player_cnt);
 }
 
 static void topsort(const vector<vector<int>>& graph, vector<int>& used, vector<int>& sorted_vertexes, int v) 
@@ -52,8 +52,9 @@ static void find_one_component(const vector<vector<int>>& graph, vector<int>& co
     {
         if (component[u] == -1)
             find_one_component(graph, component, component_graph, u, component_number);
-        else
+        else if (component[u] != -2) { // forbidden component - look at Game::neighbour_strategies_outcomes
             component_graph[component[u]].push_back(component_number);
+        }
     }
 }
 
@@ -243,14 +244,19 @@ vector<int> Game::neighbour_strategies_outcomes(const Strategy& strategy, int k)
     // Finding components
     reverse(sorted_vertexes.begin(), sorted_vertexes.end());
     vector<int> left_component(n, -1);
+    for (auto v = 0LU; v < used.size(); ++v) { // all vertexes not reachable from start are in one component. now find_one_component will not find them
+        if (!used[v]) {
+            left_component[v] = -2;
+        }
+    }
     vector<vector<int>> left_component_graph(n, vector<int>());
     int component_number = 0;
     for (auto i = 0LU; i < sorted_vertexes.size(); ++i) 
     {
-        if (left_component[sorted_vertexes[i]] == -1)
+        if (left_component[sorted_vertexes[i]] == -1) {
             find_one_component(reversed_graph, left_component, left_component_graph, sorted_vertexes[i], component_number++);
+        }
     }
-
     left_component_graph.resize(component_number);
     for (int i = 0; i < component_number; ++i) 
     {
@@ -280,6 +286,7 @@ vector<int> Game::neighbour_strategies_outcomes(const Strategy& strategy, int k)
         for (int u : left_component_graph[c_left]) {
             if (u == c_left) {
                 outcomes.push_back(component[v]);
+                
                 break;
             }
         }
@@ -330,6 +337,11 @@ int Game::get_vertices_count() const {
 int Game::get_components_count() const {
     return component_graph.size();
 }
+
+int Game::get_starting_vertex() const {
+    return start;
+}
+
 int Game::get_player_count() const {
     return player_cnt;
 }

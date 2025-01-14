@@ -3,7 +3,6 @@
 #include <ortools/sat/cp_model.h>
 
 using namespace operations_research::sat;
-using std::optional;
 
 typedef vector<vector<vector<std::optional<BoolVar>>>> VariableTable;
 

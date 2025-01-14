@@ -4,15 +4,14 @@
 
 using std::cout;
 
-void set_play_once_players(Game& g);
-void stupid_check_skeleton(Game& g);
-void smart_check_skeleton(Game& g);
-
 void set_play_once_players(Game& g) {
     int n = g.get_vertices_count();
     int cnt = 1;
-    g.set_player(0, 0);
-    for(int i = 1; i < n; ++i) {
+    g.set_player(g.get_starting_vertex(), 0);
+    for(int i = 0; i < n; ++i) {
+        if (i == g.get_starting_vertex()) {
+            continue;
+        }
         if (g.is_leaf(i)) {
             g.set_player(i, 0);
         }
@@ -55,7 +54,7 @@ bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int 
     }
     for (int player = 0; player <= num_used_players; ++player) {
         prefix.push_back(player);
-        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players + player==num_used_players, closeness_to_playonce);
+        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players + (player==num_used_players), closeness_to_playonce);
         prefix.pop_back();
         if (ans) {
             return ans;

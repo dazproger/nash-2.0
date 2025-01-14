@@ -162,8 +162,10 @@ void filter_directg(const char* source_file)
 
         Game g(graph_matrix, start);
         g.set_graph_info();
-        stupid_check_skeleton(g);
-
+        smart_check_skeleton(g, 0);
+        if (num_graphs % 1000 == 0) {
+            cout << num_graphs << "\n";
+        }
         ++num_graphs;
     }
     std::cout << "found " << num_graphs << " with cycles (not necessarily with starting vertex)\n";

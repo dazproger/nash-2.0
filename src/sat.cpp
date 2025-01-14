@@ -157,7 +157,7 @@ void SAT::solve() {
     if (response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE) {
         for (const auto &vec1 : variables) {
             for (const auto &vec2 : vec1) {
-                for (optional<BoolVar> var : vec2) {
+                for (std::optional<BoolVar> var : vec2) {
                     if (var) {
                         cout << var.value().Name() << " = " << SolutionBooleanValue(response, var.value()) << '\n';
                     }
