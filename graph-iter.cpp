@@ -130,7 +130,7 @@ void filter_directg(){
             }
         }
         int start;
-        if ((int start = graph_check(graph, has_incoming_edges)) != -1) {
+        if ((start = graph_check(graph, has_incoming_edges)) != -1) {
             // TODO: 
             ++num_graphs;
         }
