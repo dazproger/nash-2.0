@@ -79,7 +79,7 @@ void stupid_check_skeleton(Game& g) {
 }
 
 
-void smart_check_skeleton(Game& g, int closeness_to_playonce = 0) {
+void smart_check_skeleton(Game& g, int closeness_to_playonce) {
     if (!closeness_to_playonce) { // i think this is useless
         stupid_check_skeleton(g);
     } else {

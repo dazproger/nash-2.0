@@ -4,13 +4,14 @@
 // потом к каждой вершине привязать терминал
 // надо создавть инстанс класса graph, чтобы потом скармливать это в перебор
 
-void generate_geng(int); 
+void generate_graph_nauty(int graph_size, const char* destination_file); 
 
-void generate_directg();
+void generate_directed_graph_nauty(const char* source_file, const char* destination_file);
 
 // there should be a starting vertex
 // every vertex is reachable from it and it has no incoming edges
-void filter_directg(); // use readg from gtools.h or something else
+ // use readg from gtools.h or something else
+void filter_directg(const char* source_file);
 
 // add starting vertex all possible ways
 void add_start_directg(); // use readg from gtools.h or something else
