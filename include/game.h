@@ -10,10 +10,12 @@ using std::vector;
 class Game 
 {
 public:
-    Game(int, int);
-    Game(const Game&);
-    void add_edge(int, int);
-    void set_player(int, int);
+    Game(int n, int start);
+    Game(const Game& g);
+    Game(const std::vector<std::vector<int>>& graph_matrix, int start);
+
+    void add_edge(int from, int to);
+    void set_player(int i, int player);
     vector<Strategy> generate_strategies() const;
     vector<int> get_terminal_components() const;
     vector<Strategy> neighbour_strategies(const Strategy&, int) const;

@@ -9,7 +9,11 @@ Game::Game(int n, int start)
 : g(n), player(n), component(n), component_graph(n), start(start) 
 {}
 
-Game::Game(const Game& other) 
+Game::Game(const std::vector<std::vector<int>>& matrix, int start) 
+: g(matrix.size()), player(matrix.size()), component(matrix.size()), component_graph(matrix.size()), start(start) 
+{}
+
+Game::Game(const Game& other)
 {
     g = other.g;
     player = other.player;

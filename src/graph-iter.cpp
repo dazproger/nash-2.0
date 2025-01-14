@@ -4,6 +4,7 @@
 #include "string.h"
 #include "nauty.h"
 #include "gtools.h"
+#include "checker.hpp"
 
 #include <stdlib.h>
 
@@ -138,20 +139,32 @@ void filter_directg(const char* source_file)
         {
             for (int j = 0; j < n; ++j) 
             {
-                if (ISELEMENT(GRAPHROW(g, i, letters), j)) {
+                if (ISELEMENT(GRAPHROW(g, i, letters), j)) 
+                {
                     graph_matrix[i].push_back(j);
                     has_incoming_edges[j] = true;
                 }
             }
         }
 
-        int start;
-        if ((start = graph_check(graph_matrix, has_incoming_edges)) != -1) {
-            // TODO: 
-            ++num_graphs;
+        int start = graph_check(graph_matrix, has_incoming_edges);
+        if (start == -1)
+            continue;
+
+        // append terminals
+        for (int i = 0; i <= n - 1; i++)
+        {
+            if (i == start)
+                continue;
+            graph_matrix.emplace_back(); // create new vertex (terminal)
+            graph_matrix[i].push_back((int)graph_matrix.size() - 1); // link i-th vertex to the terminal
         }
 
+        Game g(graph_matrix, start);
+        g.set_graph_info();
+        stupid_check_skeleton(g);
 
+        ++num_graphs;
     }
     std::cout << "found " << num_graphs << " with cycles (not necessarily with starting vertex)\n";
     fclose(file);
