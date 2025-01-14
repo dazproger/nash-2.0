@@ -25,7 +25,7 @@ void set_play_once_players(Game& g) {
 
 bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int num_used_players, int closeness_to_playonce) {
     bool ans = false;
-    if (prefix.size() == g.get_vertices_count()) {
+    if ((int)prefix.size() == g.get_vertices_count()) {
         for (int v = 0; v < g.get_vertices_count(); ++v) {
             g.set_player(v, prefix[v]);
         }
@@ -61,7 +61,7 @@ bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int 
             return ans;
         }
     }
-
+    return ans;
 }
 
 void stupid_check_skeleton(Game& g) {
@@ -143,8 +143,8 @@ void Checker::init() {
             --t;
             pr.push_back(t);
         }
-        for (int i = 0; i + 1 < pr.size(); ++i) {
-            for (int j = i + 1; j < pr.size(); ++j) {
+        for (auto i = 0LU; i + 1 < pr.size(); ++i) {
+            for (auto j = i + 1; j < pr.size(); ++j) {
                 player_preference[p][pr[i]][pr[j]] = true;
                 player_preference[p][pr[j]][pr[i]] = false;
             }
@@ -165,7 +165,7 @@ void Checker::init() {
 // Plays strategy represeneted by the given vector from starting_vertex to the end
 int Checker::find_strategy_outcome(const vector<int>& strategy) const {
     int current = 0;
-    for (int i = 0; i < strategy.size() + 10; ++i) {
+    for (auto i = 0LU; i < strategy.size() + 10; ++i) {
         current = strategy[current];
     }
     return vertex_component[current];
@@ -203,7 +203,7 @@ void Checker::check_not_equilibrium(const vector<int>& strategy) {
 
 // Recursively generates all strategies
 void Checker::strategies_generate(vector<int>& strategy, int current_vertex) {
-    if (current_vertex == strategy.size()) {
+    if (current_vertex == (int)strategy.size()) {
         check_not_equilibrium(strategy);
         return;
     }
@@ -216,7 +216,7 @@ void Checker::strategies_generate(vector<int>& strategy, int current_vertex) {
 // Recursively generates all changes that the player can apply to a strategy and puts them in possible_changes vector
 void Checker::generate_change(int player, vector<std::pair<int, int>>& change_prefix) {
     int current_vertex_number = change_prefix.size();
-    if (current_vertex_number == vertices_by_players[player].size()) {
+    if (current_vertex_number == (int)vertices_by_players[player].size()) {
         possible_changes[player].push_back(change_prefix);
         return;
     }

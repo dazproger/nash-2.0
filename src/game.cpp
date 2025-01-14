@@ -126,7 +126,7 @@ void Game::print_components() const
     for (int i = 0; i < get_components_count(); ++i) 
     {
         cout << "Component " << i << ": ";
-        for (int j = 0; j < components[i].size(); ++j) 
+        for (auto j = 0LU; j < components[i].size(); ++j) 
         {
             if (j)
                 cout << ", ";
@@ -158,7 +158,7 @@ vector<int> Game::get_terminal_components() const
 
 static void generate(const vector<vector<int>>& g, vector<Strategy>& s, vector<int>& strategy, int done_vertexes) 
 {
-    if (done_vertexes == g.size()) 
+    if (done_vertexes == (int)g.size()) 
     {
         s.emplace_back(strategy);
         return;
@@ -241,7 +241,7 @@ vector<int> Game::neighbour_strategies_outcomes(const Strategy& strategy, int k)
     vector<int> left_component(n, -1);
     vector<vector<int>> left_component_graph(n, vector<int>());
     int component_number = 0;
-    for (int i = 0; i < sorted_vertexes.size(); ++i) 
+    for (auto i = 0LU; i < sorted_vertexes.size(); ++i) 
     {
         if (left_component[sorted_vertexes[i]] == -1)
             find_one_component(reversed_graph, left_component, left_component_graph, sorted_vertexes[i], component_number++);

@@ -46,7 +46,7 @@ int solve(const Game& g) {
 }
 
 void rec(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game& g) {
-    if (pref.size() == g.get_vertices_count()) {
+    if ((int)pref.size() == g.get_vertices_count()) {
         if (cnt_used <= 2)
             return;
         for (int v = 0; v < g.get_vertices_count(); ++v) {
@@ -125,7 +125,7 @@ bool test_new_func(Game& game) {
 }
 
 void gen_players2(vector<int>& pref, vector<int>& used, int cnt_used, int num_last, Game& g) {
-    if (pref.size() == g.get_vertices_count()) {
+    if ((int)pref.size() == g.get_vertices_count()) {
         if (cnt_used <= 2)
             return;
         for (int v = 0; v < g.get_vertices_count(); ++v) {
@@ -196,7 +196,9 @@ Game read_graph(int argc) {
 #define MAXM 10
 #include "nauty.h" // Основной заголовочный файл Nauty
 
-int main(int argc, __attribute__((unused)) char* argv[]) {
+int main(int argc, __attribute__((unused)) char* argv[]) 
+{
+    (void)argc;
     cout << "dont enter numbers higher than 6\nFOR REAL!!!!\n";
     int n;
     cin >> n;

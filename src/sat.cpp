@@ -14,16 +14,16 @@ SAT::SAT(const Game &game) {
     }
     vector<int> cnt_component = game.get_cnt_components();
     is_cycle.resize(cnt_component.size());
-    for (int i = 0; i < cnt_component.size(); ++i) {
+    for (auto i = 0LU; i < cnt_component.size(); ++i) {
         is_cycle[i] = cnt_component[i] > 1;
     }
     vector<int> terminals = game.get_terminal_components();
-    for (int i = 0; i < terminals.size(); ++i) {
+    for (auto i = 0LU; i < terminals.size(); ++i) {
         // Here we assume that an outcome can never be better than itself
         for (int k = 0; k < game.get_player_count(); ++k) {
             variables[terminals[i]][terminals[i]][k] = cp_model.FalseVar().WithName("I am always false");
         }
-        for (int j = i + 1; j < terminals.size(); ++j) {
+        for (auto j = i + 1; j < terminals.size(); ++j) {
             for (int k = 0; k < game.get_player_count(); ++k) {
                 variables[terminals[i]][terminals[j]][k] =
                     cp_model.NewBoolVar();  //.WithName(format("X_{}_{}_{}", terminals[i], terminals[j], k));
@@ -32,9 +32,9 @@ SAT::SAT(const Game &game) {
     }
     // Add triangle restrictions here
     for (int player = 0; player < game.get_player_count(); ++player) {
-        for (int first = 0; first < terminals.size(); ++first) {
-            for (int second = 0; second < first; ++second) {
-                for (int third = 0; third < second; ++third) {
+        for (auto first = 0LU; first < terminals.size(); ++first) {
+            for (auto second = 0LU; second < first; ++second) {
+                for (auto third = 0LU; third < second; ++third) {
                     int first_ter = terminals[first];
                     int second_ter = terminals[second];
                     int third_ter = terminals[third];
@@ -63,7 +63,7 @@ void SAT::add_constraint(int i, int j, int k) {
 
 static vector<int> get_terminals(const VariableTable &variables) {
     vector<int> terminals;
-    for (int i = 0; i < variables.size(); ++i) {
+    for (auto i = 0LU; i < variables.size(); ++i) {
         if (variables[i][i][0]) {
             terminals.push_back(i);
         }
@@ -110,7 +110,7 @@ void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
             non_cycles.push_back(terminal);
         }
     }
-    if (rank >= non_cycles.size())
+    if (rank >= (int)non_cycles.size())
         return;
     vector<int> mask(non_cycles.size(), 0);
     ++rank;
@@ -119,7 +119,7 @@ void SAT::limit_one_loop_rank(int cycle, int player, int rank) {
     }
     do {
         vector<BoolVar> clause;
-        for (int i = 0; i < mask.size(); ++i) {
+        for (auto i = 0LU; i < mask.size(); ++i) {
             if (mask[i]) {
                 clause.push_back(get_var(non_cycles[i], cycle, player));
             }
@@ -207,9 +207,9 @@ static vector<int> get_ranks(const CpSolverResponse &response, const VariableTab
     int k = variables[0][0].size();
     vector<int> result;
     for (int player = 0; player < k; ++player) {
-        for (int i = 0; i < terminals.size(); ++i) {
+        for (auto i = 0LU; i < terminals.size(); ++i) {
             int cnt_better_without_cycles = 0;
-            for (int j = 0; j < terminals.size(); ++j) {
+            for (auto j = 0LU; j < terminals.size(); ++j) {
                 if (i == j)
                     continue;
                 if (!is_cycle[terminals[j]]) {
@@ -232,10 +232,10 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
     vector<int> result;
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
-        for (int i = 0; i < terminals.size(); ++i) {
+        for (auto i = 0LU; i < terminals.size(); ++i) {
             int cnt_better = 0;
             int cnt_better_without_cycles = 0;
-            for (int j = 0; j < terminals.size(); ++j) {
+            for (auto j = 0LU; j < terminals.size(); ++j) {
                 if (i == j)
                     continue;
                 cnt_better += SolutionBooleanValue(response, get_var(terminals[i], terminals[j], player, variables));
@@ -250,7 +250,7 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
             }
         }
         cout << "Order for player " << player + 1 << ": ";
-        for (int i = 0; i < order.size(); ++i) {
+        for (auto i = 0LU; i < order.size(); ++i) {
             cout << (i ? " < " : "");
             if (is_cycle[terminals[order[i] - 1]])
                 cout << "\x1b[32;1m";
@@ -370,7 +370,7 @@ void SAT::add_all_strategies(const Game &game) {
 
 bool try_achieve_ranks(vector<int> ranks, const Game &g) {
     int cnt_cycles = g.get_cycles().size();
-    for (size_t i = ranks.size(); i < g.get_player_count() * cnt_cycles; ++i) {
+    for (int i = (int)ranks.size(); i < g.get_player_count() * cnt_cycles; ++i) {
         ranks.push_back(ranks.back());
     }
     sort(ranks.begin(), ranks.end());
@@ -387,7 +387,7 @@ bool try_achieve_ranks(vector<int> ranks, const Game &g) {
 
 void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
     int cnt_cycles = g.get_cycles().size();
-    for (size_t i = ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
+    for (int i = (int)ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
         ranks.push_back(ranks.back());
     }
     sort(ranks.begin(), ranks.end());
@@ -405,7 +405,7 @@ void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
 
 void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
     int cnt_cycles = g.get_cycles().size();
-    for (size_t i = ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
+    for (int i = (int)ranks.size(); i < cnt_cycles * g.get_player_count(); ++i) {
         ranks.push_back(ranks.back());
     }
     sort(ranks.begin(), ranks.end());

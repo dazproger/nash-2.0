@@ -74,7 +74,7 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
     vector<int> used(graph.size(), 0);
     bool has_cycle = false;
 
-    for (int i = 0; i < used.size(); ++i) 
+    for (auto i = 0LU; i < used.size(); ++i) 
         if (!used[i])
             has_cycle |= dfs(graph, used, i);
 
@@ -87,7 +87,7 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
     // check for starting vertex, if found -> return it
     // can skip checking for cycles if we are checking for starting vertex
     vector<int> candidates;
-    for (int i = 0; i < has_incoming_edges.size(); ++i) 
+    for (auto i = 0LU; i < has_incoming_edges.size(); ++i) 
     {
         if (!has_incoming_edges[i])
             candidates.push_back(i);
