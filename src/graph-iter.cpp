@@ -75,9 +75,12 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
     vector<int> used(graph.size(), 0);
     bool has_cycle = false;
 
-    for (auto i = 0LU; i < used.size(); ++i) 
+    for (auto i = 0LU; i < used.size(); ++i) {
+        if (graph[i].size() == 0) // checking for dead-end vertices
+            return -1;
         if (!used[i])
             has_cycle |= dfs(graph, used, i);
+    }
 
     if (!has_cycle)
         return -1;
