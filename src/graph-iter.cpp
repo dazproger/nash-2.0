@@ -5,7 +5,7 @@
 #include "nauty.h"
 #include "gtools.h"
 #include "checker.hpp"
-
+#include <unistd.h>
 #include <stdlib.h>
 
 #define WORDSIZE 64
@@ -69,30 +69,20 @@ bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
     return result;
 }
 
+
+// for oriented graphs
 int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming_edges)
 {
-    // check for cycle
     vector<int> used(graph.size(), 0);
     bool has_cycle = false;
-
-    for (auto i = 0LU; i < used.size(); ++i) {
-        if (graph[i].size() == 0) // checking for dead-end vertices
-            return -1;
-        if (!used[i])
-            has_cycle |= dfs(graph, used, i);
-    }
-
-    if (!has_cycle)
-        return -1;
-    else {
-        //return 1; // delete later
-    }
     
     // check for starting vertex, if found -> return it
-    // can skip checking for cycles if we are checking for starting vertex
+    // also checking for cycle
     vector<int> candidates;
     for (auto i = 0LU; i < has_incoming_edges.size(); ++i) 
     {
+        if (graph[i].size() == 0) // checking for dead-end vertices
+            return -1;
         if (!has_incoming_edges[i])
             candidates.push_back(i);
         used[i] = 0;
@@ -165,7 +155,7 @@ void filter_directg(const char* source_file)
 
         Game g(graph_matrix, start);
         g.set_graph_info();
-        smart_check_skeleton(g, 0);
+        smart_check_skeleton(g, 1);
         if (num_graphs % 1000 == 0) {
             cout << num_graphs << "\n";
         }
@@ -176,9 +166,60 @@ void filter_directg(const char* source_file)
     return;
 }
 
+void filter_geng(const char* source_file, const char* out_file) {
+    // open file
+    FILE* file = fopen(source_file, "r");
+    FILE* outFile = fopen(out_file, "w");
+
+    // handle error
+    if (!file) {
+        std::cerr << "Cannot open file " << source_file << std::endl;
+        exit(-1);
+    }
+
+    int max_vertices = 64; // Максимальное количество вершин в графе
+    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Размер графа в словах
+    graph g[max_vertices * m]; // Массив для хранения графа
+
+    int num_graphs = 0;
+
+    // Читаем графы из файла
+    int n;
+    int letters;
+    int is_directed;
+    while (readgg(file, g, 0, &letters, &n, &is_directed)) 
+    {
+        std::vector<std::vector<int>> graph_matrix(n);
+        int amount_of_leaves = 0;
+
+        for (int i = 0; i < n; ++i) 
+        {   
+            int degree = 0;
+            for (int j = 0; j < n; ++j) 
+            {
+                if (ISELEMENT(GRAPHROW(g, i, letters), j)) 
+                {
+                    graph_matrix[i].push_back(j);
+                    ++degree;
+                }
+            }
+            if (degree == 1) {
+                ++amount_of_leaves;
+            }
+        }
+        if (amount_of_leaves <= 1) {
+            writeg6(outFile, g, m, n);
+        }
+    }
+    fclose(file);
+    fclose(outFile);
+    return;
+}
+
 void graph_bruteforce(int n) {
     generate_graph_nauty(n, "nauty-graphs/from-geng.g6");
-    generate_directed_graph_nauty("nauty-graphs/from-geng.g6", "nauty-graphs/from-directg.d6");
+    filter_geng("nauty-graphs/from-geng.g6", "nauty-graphs/filtered-geng.g6");
+    generate_directed_graph_nauty("nauty-graphs/filtered-geng.g6", "nauty-graphs/from-directg.d6");
     filter_directg("nauty-graphs/from-directg.d6");
     //or add_start_directg();
     // parse to Game (in filter)

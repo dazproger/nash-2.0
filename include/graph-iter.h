@@ -14,6 +14,6 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
 void filter_directg(const char* source_file);
 
 // add starting vertex all possible ways
-void add_start_directg(); // use readg from gtools.h or something else
+void filter_geng(const char* source_file, const char* out_file); // use readg from gtools.h or something else
 
 void graph_bruteforce(int);
