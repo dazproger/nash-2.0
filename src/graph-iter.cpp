@@ -10,8 +10,16 @@
 
 #define WORDSIZE 64
 
+#define RESET "\033[0m"
+#define YELLOW "\033[1;33m"
+#define YELLOWLOG(message) std::cout << YELLOW << message << RESET << '\n';
+#define LOGSTART YELLOWLOG(std::string("[") + __func__ + "] START")
+#define LOGEND YELLOWLOG(std::string("[") + __func__ + "] END\n")
+
 void generate_graph_nauty(int graph_size, const char* destination_file) 
 {
+    LOGSTART
+
     // generate shell command string and open pipe
     std::string command = "geng -c " + std::to_string(graph_size) + ' ' + destination_file;
     FILE* pipe = popen(command.c_str(), "r");
@@ -30,10 +38,14 @@ void generate_graph_nauty(int graph_size, const char* destination_file)
 
     // close pipe
     pclose(pipe);
+
+    LOGEND
 }
 
 void generate_directed_graph_nauty(const char* source_file, const char* destination_file) 
 {
+    LOGSTART
+
     // generate shell command and open pipe
     std::string command = std::string("directg ") + source_file + " " + destination_file;
     FILE* pipe = popen(command.c_str(), "r");
@@ -52,6 +64,8 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
 
     // close pipe
     pclose(pipe);
+
+    LOGEND
 }
 
 bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
@@ -99,11 +113,15 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
         if (!element)
             return -1;
 
+
     return candidates[0];
 }
 
 void filter_directg(const char* source_file)
 {
+
+    LOGSTART
+
     // open file
     FILE* file = fopen(source_file, "r");
 
@@ -163,6 +181,8 @@ void filter_directg(const char* source_file)
     }
     std::cout << "found " << num_graphs << " with cycles (not necessarily with starting vertex)\n";
     fclose(file);
+
+    LOGEND
     return;
 }
 
