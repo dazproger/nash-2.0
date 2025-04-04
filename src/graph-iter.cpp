@@ -1,12 +1,11 @@
 #include "graph-iter.h"
 #include "game.h"
 #include "sat.h"
-#include "string.h"
+#include "cstring"
 #include "nauty.h"
 #include "gtools.h"
 #include "checker.hpp"
-#include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #define WORDSIZE 64
 
@@ -95,7 +94,7 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
     vector<int> candidates;
     for (auto i = 0LU; i < has_incoming_edges.size(); ++i) 
     {
-        if (graph[i].size() == 0) // checking for dead-end vertices
+        if (graph[i].empty()) // checking for dead-end vertices
             return -1;
         if (!has_incoming_edges[i])
             candidates.push_back(i);
@@ -183,7 +182,6 @@ void filter_directg(const char* source_file)
     fclose(file);
 
     LOGEND
-    return;
 }
 
 void filter_geng(const char* source_file, const char* out_file) {
@@ -233,7 +231,6 @@ void filter_geng(const char* source_file, const char* out_file) {
     }
     fclose(file);
     fclose(outFile);
-    return;
 }
 
 void graph_bruteforce(int n) {
