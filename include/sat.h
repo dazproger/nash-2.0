@@ -1,3 +1,4 @@
+#pragma once
 #include "strategy.h"
 #include "game.h"
 #include <ortools/sat/cp_model.h>

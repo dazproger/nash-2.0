@@ -1,16 +1,9 @@
 #pragma once
 
-#include <fstream>
 #include <vector>
-#include <iostream>
-
-using std::cout;
-using std::vector;
 
 void stupid_check_skeleton(Game& g);
 void smart_check_skeleton(Game& g, int closeness_to_playonce = 0);
-
-void one_infinite_check_skeleton(Game& g, int closeness_to_playonce = 0);
 
 class Checker 
 {
@@ -18,13 +11,13 @@ public:
     // Function that initializes Checker from graphs/c22_contrexample
     void init();
 
-    // Plays strategy represeneted by the given vector from starting_vertex to the end
+    // Plays strategy represented by the given vector from starting_vertex to the end
     int find_strategy_outcome(const vector<int>& strategy) const;
 
     // Checks whether the player can get a better outcome for himself by changing the given strategy
     bool is_improvable_by_player(int player, const vector<int>& strategy) const;
 
-    // Checks that the strategy is not a nash equililbrium
+    // Checks that the strategy is not a Nash Equilibrium
     void check_not_equilibrium(const vector<int>& strategy);
 
     // Recursively generates all strategies
@@ -36,7 +29,7 @@ public:
     // Fills possible_changes vector
     void make_changes();
 
-    // Checks that the example given in graphs/c22_contrexample does not have a Nash equililbrium
+    // Checks that the example given in graphs/c22_contrexample does not have a Nash Equilibrium
     bool check();
 
 private:
@@ -51,5 +44,5 @@ private:
     vector<int> vertex_player;  // vertex_player[v] is number of player that controls this vertex
     vector<vector<int>> vertices_by_players;                  // Vertices grouped by players
     vector<vector<vector<std::pair<int, int>>>> possible_changes;  // Array of all possible ways how a strategy can change
-    bool is_correct = true;  // Controls whether has Nash equililbrium been found or not
+    bool is_correct = true;  // Controls whether it has Nash Equilibrium been found or not
 };

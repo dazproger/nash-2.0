@@ -1,8 +1,4 @@
 #include "sat.h"
-// #include <format>
-using std::cout;
-using std::cerr;
-using std::endl;
 
 SAT::SAT(const Game &game) {
     variables.resize(game.get_components_count());
@@ -38,9 +34,7 @@ SAT::SAT(const Game &game) {
                     int first_ter = terminals[first];
                     int second_ter = terminals[second];
                     int third_ter = terminals[third];
-                    // a bit of a kostil here, i should have checked, that one of the edges is backwards,
-                    // but we have triangles in both directions, so i can check, that one of them is in the right
-                    // direction
+
                     vector<BoolVar> triangle;
                     triangle.push_back(get_var(first_ter, second_ter, player));
                     triangle.push_back(get_var(second_ter, third_ter, player));
@@ -73,9 +67,9 @@ static vector<int> get_terminals(const VariableTable &variables) {
 
 void SAT::minimize_loop_rank(int cycle, int player) {
     if (!is_cycle[cycle]) {
-        cerr << "\x1b[31;1m";  // Print in bold red
-        cerr << "NOT A CYCLE" << endl;
-        cerr << "\x1b[0m";  // Reset color
+        std::cerr << "\x1b[31;1m";
+        std::cerr << "NOT A CYCLE" << std::endl;
+        std::cerr << "\x1b[0m";
         return;
     }
     vector<int> terminals = get_terminals(variables);
@@ -159,29 +153,28 @@ void SAT::solve() {
             for (const auto &vec2 : vec1) {
                 for (std::optional<BoolVar> var : vec2) {
                     if (var) {
-                        cout << var.value().Name() << " = " << SolutionBooleanValue(response, var.value()) << '\n';
+                        std::cout << var.value().Name() << " = " << SolutionBooleanValue(response, var.value()) << '\n';
                     }
                 }
-                cout << '\n';
+                std::cout << '\n';
             }
-            cout << "==================\n";
+            std::cout << "==================\n";
         }
     } else {
-        cout << "Solution not found (((((((" << endl;
+        std::cout << "Solution was not found" << std::endl;
     }
 }
 
 static BoolVar get_var(int i, int j, int k, const VariableTable &variables) {
     if (i < j) {
         return variables[i][j][k].value();
-    } else {
-        return variables[j][i][k].value().Not();
     }
+    return variables[j][i][k].value().Not();
 }
 
 static void print_usual(const CpSolverResponse &response, const VariableTable &variables) {
     vector<int> terminals = get_terminals(variables);
-    int k = variables[0][0].size();
+    int k = (int)variables[0][0].size();
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
         for (int i : terminals) {
@@ -193,18 +186,18 @@ static void print_usual(const CpSolverResponse &response, const VariableTable &v
             }
             order[cnt_better] = i;
         }
-        cout << "Order for player " << player << ": ";
-        for (auto elem : order) {
-            cout << elem << ' ';
+        std::cout << "Order for player " << player << ": ";
+        for (auto element : order) {
+            std::cout << element << ' ';
         }
-        cout << '\n';
+        std::cout << '\n';
     }
 }
 
 static vector<int> get_ranks(const CpSolverResponse &response, const VariableTable &variables,
                              const vector<bool> &is_cycle) {
     vector<int> terminals = get_terminals(variables);
-    int k = variables[0][0].size();
+    int k = (int)variables[0][0].size();
     vector<int> result;
     for (int player = 0; player < k; ++player) {
         for (auto i = 0LU; i < terminals.size(); ++i) {
@@ -228,7 +221,7 @@ static vector<int> get_ranks(const CpSolverResponse &response, const VariableTab
 
 static void print_beautiful(const CpSolverResponse &response, const VariableTable &variables, vector<bool> is_cycle) {
     vector<int> terminals = get_terminals(variables);
-    int k = variables[0][0].size();
+    int k = (int)variables[0][0].size();
     vector<int> result;
     for (int player = 0; player < k; ++player) {
         vector<int> order(terminals.size());
@@ -249,30 +242,30 @@ static void print_beautiful(const CpSolverResponse &response, const VariableTabl
                 result.push_back(cnt_better_without_cycles);
             }
         }
-        cout << "Order for player " << player + 1 << ": ";
+        std::cout << "Order for player " << player + 1 << ": ";
         for (auto i = 0LU; i < order.size(); ++i) {
-            cout << (i ? " < " : "");
+            std::cout << (i ? " < " : "");
             if (is_cycle[terminals[order[i] - 1]])
-                cout << "\x1b[32;1m";
-            cout << order[i];
+                std::cout << "\x1b[32;1m";
+            std::cout << order[i];
             if (is_cycle[terminals[order[i] - 1]])
-                cout << "\x1b[0m";
+                std::cout << "\x1b[0m";
         }
-        cout << '\n';
+        std::cout << '\n';
     }
     std::sort(result.begin(), result.end(), std::greater<>());
-    cout << "Result:\n";
+    std::cout << "Result:\n";
     for (auto el : result) {
-        cout << el << " ";
+        std::cout << el << " ";
     }
-    cout << '\n';
+    std::cout << '\n';
 }
 
 void SAT::print_results() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
     if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
-        cout << "Solution not found (((((((" << endl;
+        std::cout << "Solution was not found" << std::endl;
         return;
     }
     print_usual(response, variables);
@@ -281,7 +274,7 @@ void SAT::print_beautiful_results() {
     Model model;
     const CpSolverResponse response = SolveCpModel(cp_model.Build(), &model);
     if (!(response.status() == CpSolverStatus::OPTIMAL || response.status() == CpSolverStatus::FEASIBLE)) {
-        cout << "There always will be a Nash Equilibrium" << endl;
+        std::cout << "There always will be a Nash Equilibrium" << std::endl;
         return;
     }
     print_beautiful(response, variables, is_cycle);
@@ -291,7 +284,7 @@ void SAT::print_all_solutions() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << ++num_solutions << '\n';
+        std::cout << "Solution #" << ++num_solutions << '\n';
         print_usual(response, variables);
     }));
     SatParameters parameters;
@@ -303,9 +296,9 @@ void SAT::print_all_beautiful_solutions() {
     Model model;
     int num_solutions = 0;
     model.Add(NewFeasibleSolutionObserver([&](const CpSolverResponse &response) {
-        cout << "Solution #" << ++num_solutions << '\n';
+        std::cout << "Solution #" << ++num_solutions << '\n';
         print_beautiful(response, variables, is_cycle);
-        cout << "\n////////////////////////////////////////////////////////////////////////////\n";
+        std::cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;
     parameters.set_enumerate_all_solutions(true);
@@ -321,9 +314,9 @@ void SAT::print_all_solutions_close_to_c22() {
         if (ranks[1] > 2) {
             return;
         }
-        cout << "Solution #" << ++num_solutions << '\n';
+        std::cout << "Solution #" << ++num_solutions << '\n';
         print_beautiful(response, variables, is_cycle);
-        cout << "\n////////////////////////////////////////////////////////////////////////////\n";
+        std::cout << "\n////////////////////////////////////////////////////////////////////////////\n";
     }));
     SatParameters parameters;
     parameters.set_enumerate_all_solutions(true);
@@ -400,7 +393,7 @@ void print_example_achieve_ranks(vector<int> ranks, const Game &g) {
             return;
         }
     } while (next_permutation(ranks.begin(), ranks.end()));
-    cout << "No res :sad_face:" << endl;
+    std::cout << "No results" << std::endl;
 }
 
 void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
@@ -421,6 +414,5 @@ void print_all_achieve_ranks(vector<int> ranks, const Game &g) {
 
 void print_all_solutions_close_to_c22(const Game &g) {
     vector<int> ranks(g.get_cycles().size() * g.get_player_count(), 2);
-    //ranks[0] = static_cast<int>(1e9) + 10;
     print_all_achieve_ranks(ranks, g);
 }

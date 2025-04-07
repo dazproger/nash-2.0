@@ -1,14 +1,10 @@
-
 #pragma once
-#include <unordered_set>
 #include <vector>
 #include <iostream>
 
-using std::vector;
-
-struct Strategy {
+class Strategy {
 public:
-    Strategy(const vector<int>& strategy) {
+    Strategy(const std::vector<int>& strategy) {
         data_ = strategy;
     }
     int operator[](int from) const {
@@ -40,5 +36,5 @@ public:
         std::cout << "\n";
     }
 private:
-    vector<int> data_;
+    std::vector<int> data_;
 };

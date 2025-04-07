@@ -3,15 +3,12 @@
 #include <iostream>
 #include "checker.hpp"
 
-using std::cout;
-using std::vector;
-
 int main() 
 {
     Checker checker;
     if (checker.check()) {
-        cout << "OK.\n";
+        std::cout << "OK.\n";
     } else {
-        cout << "Something went wrong.\n";
+        std::cout << "Something went wrong.\n";
     }
 }

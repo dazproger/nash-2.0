@@ -1,12 +1,13 @@
 #include "game.h"
 #include "sat.h"
 #include "checker.hpp"
+#include <fstream>
 
 using std::cout;
 
 void set_play_once_players(Game& g) {
     int n = g.get_vertices_count();
-    int cnt = 1;
+    int count = 1;
     g.set_player(g.get_starting_vertex(), 0);
     for(int i = 0; i < n; ++i) {
         if (i == g.get_starting_vertex()) {
@@ -16,14 +17,14 @@ void set_play_once_players(Game& g) {
             g.set_player(i, 0);
         }
         else {
-            g.set_player(i, cnt);
-            ++cnt;
+            g.set_player(i, count);
+            ++count;
         }
     }
 }
 
 bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int num_used_players, int closeness_to_playonce) {
-    bool ans = false;
+    bool answer = false;
     if ((int)prefix.size() == g.get_vertices_count()) {
         for (int v = 0; v < g.get_vertices_count(); ++v) {
             g.set_player(v, prefix[v]);
@@ -33,43 +34,40 @@ bool recursive_gen_players(Game& g, vector<int>& prefix, int non_terminals, int 
         if (!initial_sat.is_solvable()) {
             g.reset_max_player();
             return false;
-        } else {
-            g.print_graph();
-            initial_sat.print_beautiful_results();
-            cout << "hell yeah\n";
-            return true;
         }
+        g.print_graph();
+        initial_sat.print_beautiful_results();
+        cout << "There is no Nash Equilibrium in this game\n";
+        return true;
     }
     if (g.is_leaf(prefix.size())) {
         prefix.push_back(0);
-        ans |= recursive_gen_players(g, prefix, non_terminals, num_used_players, closeness_to_playonce);
+        answer |= recursive_gen_players(g, prefix, non_terminals, num_used_players, closeness_to_playonce);
         prefix.pop_back();
-        return ans;
+        return answer;
     }
     if (non_terminals - num_used_players == closeness_to_playonce) {
         prefix.push_back(num_used_players);
-        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players+1, closeness_to_playonce);
+        answer |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players+1, closeness_to_playonce);
         prefix.pop_back();
-        return ans;
+        return answer;
     }
     for (int player = 0; player <= num_used_players; ++player) {
         prefix.push_back(player);
-        ans |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players + (player==num_used_players), closeness_to_playonce);
+        answer |= recursive_gen_players(g, prefix, non_terminals+1, num_used_players + (player==num_used_players), closeness_to_playonce);
         prefix.pop_back();
-        if (ans) {
-            return ans;
+        if (answer) {
+            return answer;
         }
     }
-    return ans;
+    return answer;
 }
 
 void stupid_check_skeleton(Game& g) {
     set_play_once_players(g);
     SAT initial_sat(g);
     initial_sat.add_all_strategies(g);
-    if (!initial_sat.is_solvable()) {
-        // cout << "\x1b[31;1mThere is a Nash Equilibirum((((\x1b[0m";
-    } else {
+    if (initial_sat.is_solvable()) {
         g.print_graph();
         initial_sat.print_beautiful_results();
         cout << "hell yeah\n";
@@ -79,31 +77,23 @@ void stupid_check_skeleton(Game& g) {
 
 
 void smart_check_skeleton(Game& g, int closeness_to_playonce) {
-    if (!closeness_to_playonce) { // i think this is useless
+    if (!closeness_to_playonce) {
         stupid_check_skeleton(g);
     } else {
         vector<int> prefix;
         bool ans = recursive_gen_players(g, prefix, 0, 0, closeness_to_playonce);
-        //??? return ans;
     }
-
-
-}
-
-// works only for one whole infinite outcome
-void one_infinite_check_skeleton(Game& g, int closeness_to_playonce) {
-    // go threw some предпочтения check is there Nash equilibruim
 }
 
 // Function that initializes Checker from graphs/c22_contrexample
 void Checker::init() {
     std::ifstream in("graphs/c22_contrexample");
     players_count = 3;
-    ////////////////////////// Graph input //////////////////////////
+    // Graph input
     in >> vertices_count;
     in >> starting_vertex;
     --starting_vertex;
-    int edges_count;  // Number of edges in the graph
+    int edges_count; // Number of edges in the graph
     in >> edges_count;
     graph.assign(vertices_count, {});
     for (int i = 0; i < edges_count; ++i) {
@@ -119,7 +109,7 @@ void Checker::init() {
             graph[i].push_back(i);
         }
     }
-    ///////////////////// Terminals info input //////////////////////
+    // Terminals info input
     in >> terminals_count;
     vertex_component.assign(vertices_count, -1);
     for (int i = 0; i < terminals_count; ++i) {
@@ -132,7 +122,7 @@ void Checker::init() {
             vertex_component[vertex] = i;
         }
     }
-    ///////////////// Setting up player preference //////////////////
+    // Setting up player preference
     player_preference.assign(players_count, vector<vector<bool>>(terminals_count, vector<bool>(terminals_count)));
     for (int p = 0; p < players_count; ++p) {
         vector<int> pr;
@@ -149,7 +139,7 @@ void Checker::init() {
             }
         }
     }
-    ///////////////////////// Players input /////////////////////////
+    // Players input
     vertex_player.assign(vertices_count, 0);
     vertices_by_players.assign(players_count, vector<int>());
     for (int i = 0; i < vertices_count; ++i) {
@@ -161,7 +151,7 @@ void Checker::init() {
     in.close();
 }
 
-// Plays strategy represeneted by the given vector from starting_vertex to the end
+// Plays strategy represented by the given vector from starting_vertex to the end
 int Checker::find_strategy_outcome(const vector<int>& strategy) const {
     int current = 0;
     for (auto i = 0LU; i < strategy.size() + 10; ++i) {
@@ -186,7 +176,7 @@ bool Checker::is_improvable_by_player(int player, const vector<int>& strategy) c
     return false;
 }
 
-// Checks that the strategy is not a nash equililbrium
+// Checks that the strategy is not a Nash Equilibrium
 void Checker::check_not_equilibrium(const vector<int>& strategy) {
     for (int player = 0; player < players_count; ++player) {
         if (is_improvable_by_player(player, strategy))
@@ -234,7 +224,7 @@ void Checker::make_changes() {
     }
 }
 
-// Checks that the example given in graphs/c22_contrexample does not have a Nash equililbrium
+// Checks that the example given in graphs/c22_contrexample does not have a Nash Equilibrium
 bool Checker::check() {
     init();
     make_changes();
