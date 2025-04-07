@@ -108,6 +108,41 @@ bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
     return result;
 }
 
+bool has_no_cycles(const std::vector<std::vector<int>>& graph) 
+{
+    int n = graph.size();
+    std::vector<bool> visited(n, false);
+    std::vector<bool> rec_stack(n, false);
+
+    auto lambda_dfs = 
+    [&](int node, auto&& lambda_dfs) -> bool 
+    {
+        visited[node] = true;
+        rec_stack[node] = true;
+
+        for (int neighbor : graph[node]) {
+            if (!visited[neighbor])
+                if (lambda_dfs(neighbor, lambda_dfs))
+                    return true;
+            else if (rec_stack[neighbor])
+                return true;
+        }
+
+        rec_stack[node] = false;
+        return false;
+    };
+
+    for (int node = 0; node < n; ++node) {
+        if (!visited[node]) {
+            if (lambda_dfs(node, lambda_dfs)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 // for oriented graphs
 int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming_edges)
 {
