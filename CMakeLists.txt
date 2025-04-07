@@ -27,7 +27,8 @@ set(SOURCES
     src/game.cpp 
     src/sat.cpp
     src/checker.cpp
-    src/graph-iter.cpp)
+    src/graph-iter.cpp
+        include/output-colors.h)
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SOURCES})
 

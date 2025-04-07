@@ -5,25 +5,20 @@
 #include "nauty.h"
 #include "gtools.h"
 #include "checker.hpp"
+#include "output-colors.h"
 #include <cstdlib>
 
 #define WORDSIZE 64
-
-#define RESET "\033[0m"
-#define YELLOW "\033[1;33m"
-#define YELLOWLOG(message) std::cout << YELLOW << message << RESET << '\n';
-#define LOGSTART YELLOWLOG(std::string("[") + __func__ + "] START")
-#define LOGEND YELLOWLOG(std::string("[") + __func__ + "] END\n")
 
 void generate_graph_nauty(int graph_size, const char* destination_file) 
 {
     LOGSTART
 
-    // generate shell command string and open pipe
-    std::string command = "geng -c " + std::to_string(graph_size) + ' ' + destination_file;
+    // Shell command string generation and pipe opening
+    const std::string command = "geng -c " + std::to_string(graph_size) + ' ' + destination_file;
     FILE* pipe = popen(command.c_str(), "r");
 
-    // handle error
+    // Error handling
     if (!pipe) {
         std::cerr << "Failed to open pipe with command \"" << command.c_str() << "\"\n";
         exit(-1);
@@ -32,10 +27,11 @@ void generate_graph_nauty(int graph_size, const char* destination_file)
     char buffer[128];
     std::cout << "Response" << std::endl;
 
+    // Line-by-line graph output
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
-        std::cout << buffer; // Выводим графы построчно
+        std::cout << buffer;
 
-    // close pipe
+    // Pipe closing
     pclose(pipe);
 
     LOGEND
@@ -45,11 +41,11 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
 {
     LOGSTART
 
-    // generate shell command and open pipe
+    // Shell command string generation and pipe opening
     std::string command = std::string("directg ") + source_file + " " + destination_file;
     FILE* pipe = popen(command.c_str(), "r");
 
-    // handle error
+    // Error handling
     if (!pipe) {
         std::cerr << "Failed to open pipe with command \"" << command.c_str() << "\"\n";
         exit(-1);    
@@ -58,10 +54,11 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
     char buffer[128];
     std::cout << "Response" << std::endl;
 
+    // Line-by-line graph output
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
-        std::cout << buffer; // Выводим графы построчно
+        std::cout << buffer;
 
-    // close pipe
+    // Pipe closing
     pclose(pipe);
 
     LOGEND
@@ -71,11 +68,11 @@ void generate_directed_graph_o_nauty(const char* source_file, const char* destin
 {
     LOGSTART
 
-    // generate shell command and open pipe
+    // Shell command string generation and pipe opening
     std::string command = std::string("directg -o") + source_file + " " + destination_file;
     FILE* pipe = popen(command.c_str(), "r");
 
-    // handle error
+    // Error handling
     if (!pipe) {
         std::cerr << "Failed to open pipe with command \"" << command.c_str() << "\"\n";
         exit(-1);    
@@ -84,10 +81,11 @@ void generate_directed_graph_o_nauty(const char* source_file, const char* destin
     char buffer[128];
     std::cout << "Response" << std::endl;
 
+    // Line-by-line graph output
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
-        std::cout << buffer; // Выводим графы построчно
+        std::cout << buffer;
 
-    // close pipe
+    // Pipe closing
     pclose(pipe);
 
     LOGEND
@@ -97,13 +95,14 @@ bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
     used[v] = 1;
     bool result = false;
 
-    for (auto el : graph[v]) 
+    for (const auto element : graph[v])
     {
-        if (used[el] == 1)
+        if (used[element] == 1)
             result = true;
-        else if (used[el] == 0)
-            result |= dfs(graph, used, el);
+        else if (used[element] == 0)
+            result |= dfs(graph, used, element);
     }
+
     used[v] = 2;
     return result;
 }
@@ -143,21 +142,21 @@ bool has_no_cycles(const std::vector<std::vector<int>>& graph)
     return true;
 }
 
-// for oriented graphs
+// For oriented graphs
 int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming_edges)
 {
     vector<int> used(graph.size(), 0);
     bool has_cycle = false;
     
-    // check for starting vertex, if found -> return it
-    // also checking for cycle
+    // Check for starting vertex, if found -> return it
+    // Also checking for cycle
     vector<int> candidates;
     for (auto i = 0LU; i < has_incoming_edges.size(); ++i) 
     {
-        if (graph[i].empty()) // checking for dead-end vertices
+        if (graph[i].empty()) // Checking for dead-end vertices
             return -1;
         if (!has_incoming_edges[i])
-            candidates.push_back(i);
+            candidates.push_back((int)i);
         used[i] = 0;
     }
 
@@ -168,7 +167,7 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
     if (!has_cycle)
         return -1;
 
-    for (auto element : used)
+    for (const auto element : used)
         if (!element)
             return -1;
 
@@ -180,22 +179,22 @@ void filter_directg(const char* source_file)
 {
     LOGSTART
 
-    // open file
+    // File opening
     FILE* file = fopen(source_file, "r");
 
-    // handle error
+    // Error handling
     if (!file) {
         std::cerr << "Cannot open file " << source_file << std::endl;
         exit(-1);
     }
 
-    int max_vertices = 64; // Максимальное количество вершин в графе
-    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Размер графа в словах
-    graph g[max_vertices * m]; // Массив для хранения графа
+    const int max_vertices = 64;
+    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Graph size in words
+    graph g[max_vertices * m];
 
     int num_graphs = 0;
 
-    // Читаем графы из файла
+    // Reading graphs from files
     int n;
     int letters;
     int is_directed;
@@ -220,13 +219,13 @@ void filter_directg(const char* source_file)
         if (start == -1)
             continue;
 
-        // append terminals
+        // Terminals appending
         for (int i = 0; i <= n - 1; i++)
         {
             if (i == start)
                 continue;
-            graph_matrix.emplace_back(); // create new vertex (terminal)
-            graph_matrix[i].push_back((int)graph_matrix.size() - 1); // link i-th vertex to the terminal
+            graph_matrix.emplace_back();
+            graph_matrix[i].push_back((int)graph_matrix.size() - 1);
         }
 
         Game g(graph_matrix, start);
@@ -244,23 +243,23 @@ void filter_directg(const char* source_file)
 }
 
 void filter_geng(const char* source_file, const char* out_file) {
-    // open file
+    // File opening
     FILE* file = fopen(source_file, "r");
     FILE* outFile = fopen(out_file, "w");
 
-    // handle error
+    // Error handling
     if (!file) {
         std::cerr << "Cannot open file " << source_file << std::endl;
         exit(-1);
     }
 
-    int max_vertices = 64; // Максимальное количество вершин в графе
-    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Размер графа в словах
-    graph g[max_vertices * m]; // Массив для хранения графа
+    const int max_vertices = 64;
+    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Graph size in words
+    graph g[max_vertices * m];
 
     int num_graphs = 0;
 
-    // Читаем графы из файла
+    // Reading graphs from files
     int n;
     int letters;
     int is_directed;
