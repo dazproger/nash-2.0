@@ -232,7 +232,7 @@ void filter_directg(const char* source_file)
         g.set_graph_info();
         smart_check_skeleton(g, 1);
         if (num_graphs % 1000 == 0) {
-            cout << num_graphs << "\n";
+            std::cout << num_graphs << "\n";
         }
         ++num_graphs;
     }
