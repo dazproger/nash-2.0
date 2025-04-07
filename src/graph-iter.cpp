@@ -6,7 +6,9 @@
 #include "gtools.h"
 #include "checker.hpp"
 #include "output-colors.h"
+
 #include <cstdlib>
+#include <filesystem>
 
 #define WORDSIZE 64
 
@@ -343,6 +345,8 @@ const char filtered_acyclic[] = "nauty-graphs/filtered-pickg.g6";
 
 void graph_bruteforce(int n) 
 {
+    std::filesystem::create_directory("nauty-graphs");
+
     generate_graph_nauty(n, generated);
     filter_geng(generated, filtered);
     generate_directed_graph_o_nauty(filtered, oriented);
