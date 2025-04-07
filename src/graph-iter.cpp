@@ -42,7 +42,7 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
     LOGSTART
 
     // Shell command string generation and pipe opening
-    std::string command = std::string("directg ") + source_file + " " + destination_file;
+    std::string command = std::string("directg \'") + source_file + "\' \'" + destination_file + "\'";
     FILE* pipe = popen(command.c_str(), "r");
 
     // Error handling
@@ -69,7 +69,7 @@ void generate_directed_graph_o_nauty(const char* source_file, const char* destin
     LOGSTART
 
     // Shell command string generation and pipe opening
-    std::string command = std::string("directg -o") + source_file + " " + destination_file;
+    std::string command = std::string("directg -o \'") + source_file + "\' \'" + destination_file + "\'";
     FILE* pipe = popen(command.c_str(), "r");
 
     // Error handling
