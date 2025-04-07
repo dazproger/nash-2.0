@@ -11,3 +11,5 @@ nash_equilibrium
 sat-test
 Makefile
 Testing/
+*.ovpn
+hseserver-info*

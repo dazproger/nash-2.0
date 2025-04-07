@@ -68,6 +68,32 @@ void generate_directed_graph_nauty(const char* source_file, const char* destinat
     LOGEND
 }
 
+void generate_directed_graph_o_nauty(const char* source_file, const char* destination_file) 
+{
+    LOGSTART
+
+    // generate shell command and open pipe
+    std::string command = std::string("directg -o") + source_file + " " + destination_file;
+    FILE* pipe = popen(command.c_str(), "r");
+
+    // handle error
+    if (!pipe) {
+        std::cerr << "Failed to open pipe with command \"" << command.c_str() << "\"\n";
+        exit(-1);    
+    }
+
+    char buffer[128];
+    std::cout << "Response" << std::endl;
+
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+        std::cout << buffer; // Выводим графы построчно
+
+    // close pipe
+    pclose(pipe);
+
+    LOGEND
+}
+
 bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
     used[v] = 1;
     bool result = false;
@@ -82,7 +108,6 @@ bool dfs(std::vector<std::vector<int>>& graph, vector<int>& used, int v) {
     used[v] = 2;
     return result;
 }
-
 
 // for oriented graphs
 int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming_edges)
@@ -119,7 +144,6 @@ int graph_check(std::vector<std::vector<int>>& graph, vector<bool>& has_incoming
 
 void filter_directg(const char* source_file)
 {
-
     LOGSTART
 
     // open file
@@ -236,12 +260,17 @@ void filter_geng(const char* source_file, const char* out_file) {
     return;
 }
 
-void graph_bruteforce(int n) {
-    generate_graph_nauty(n, "nauty-graphs/from-geng.g6");
-    filter_geng("nauty-graphs/from-geng.g6", "nauty-graphs/filtered-geng.g6");
-    generate_directed_graph_nauty("nauty-graphs/filtered-geng.g6", "nauty-graphs/from-directg.d6");
-    filter_directg("nauty-graphs/from-directg.d6");
-    //or add_start_directg();
-    // parse to Game (in filter)
-    // check (in filter)
+const char generated[] = "nauty-graphs/from-geng.g6";
+const char filtered[] = "nauty-graphs/filtered-geng.g6";
+const char oriented[] = "nauty-graphs/from-directg.d6";
+const char filtered_acyclic[] = "nauty-graphs/filtered-pickg.g6";
+
+
+void graph_bruteforce(int n) 
+{
+    generate_graph_nauty(n, generated);
+    filter_geng(generated, filtered);
+    generate_directed_graph_o_nauty(filtered, oriented);
+    filter_directg(oriented);
 }
+
