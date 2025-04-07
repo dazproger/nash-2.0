@@ -242,6 +242,50 @@ void filter_directg(const char* source_file)
     LOGEND
 }
 
+void filter_DAGs(const char* source_file, const char* destination_file)
+{
+    // File opening
+    FILE* file = fopen(source_file, "r");
+    FILE* outFile = fopen(destination_file, "w");
+
+    // Error handling
+    if (!file) {
+        std::cerr << "Cannot open file " << source_file << std::endl;
+        exit(-1);
+    }
+
+    if (!outFile) {
+        std::cerr << "Cannot open file " << destination_file << std::endl;
+        exit(-1);
+    }
+
+    const int max_vertices = 64;
+    const int m = (max_vertices + WORDSIZE - 1) / WORDSIZE; // Graph size in words
+    graph g[max_vertices * m];
+
+    int num_graphs = 0;
+
+    // Reading graphs from files
+    int n;
+    int letters;
+    int is_directed;
+    while (readgg(file, g, 0, &letters, &n, &is_directed)) 
+    {
+        std::vector<std::vector<int>> graph_matrix(n);
+        int amount_of_leaves = 0;
+
+        for (int i = 0; i < n; ++i) 
+            for (int j = 0; j < n; ++j) 
+                if (ISELEMENT(GRAPHROW(g, i, letters), j)) 
+                    graph_matrix[i].push_back(j);
+
+        if (has_no_cycles(graph_matrix))
+            writed6(outFile, g, m, n);
+    }
+    fclose(file);
+    fclose(outFile);
+}
+
 void filter_geng(const char* source_file, const char* out_file) {
     // File opening
     FILE* file = fopen(source_file, "r");
@@ -304,4 +348,3 @@ void graph_bruteforce(int n)
     generate_directed_graph_o_nauty(filtered, oriented);
     filter_directg(oriented);
 }
-

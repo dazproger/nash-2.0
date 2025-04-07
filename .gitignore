@@ -13,7 +13,5 @@ Makefile
 Testing/
 *.ovpn
 hseserver-info*
-graphs
-graphs-with-players
 nauty-graphs
 
