@@ -7,7 +7,7 @@ int main(int argc, __attribute__((unused)) char* argv[])
     (void)argc;
 
     int n;
-    REDLOG("Do not enter numbers higher than 6!");
+    REDLOG("Enter the number of vertices");
     std::cin >> n;
 
     graph_bruteforce(n);
